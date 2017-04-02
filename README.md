@@ -26,7 +26,7 @@ Table of contents
     * [Interpreter](#interpreter)
   * [Examples](#examples)
     * [Interpretable code examples](#interpretable-code-examples)
-    * [Missing JS syntax examples](#missing-js-syntax-examples)
+    * [Not supported JS syntax examples](#not-supported-js-syntax-examples)
 
 
 Interpretable language specification
@@ -64,6 +64,7 @@ Lexical units
 | 24  | '+' | |
 | 25  | '/' | |
 | 26  | '|' | |
+| 27  | return | |
 
 Syntax
 ------
@@ -72,6 +73,9 @@ Syntax
 ```C
 Program
     = Declaration DeclarationSeparator Program
+    | OneLineCommaOperator OneLineCommaOperatorSeparator Program
+    | ';'
+    | '\n'
 ```
 
 #### Declaration
@@ -80,7 +84,6 @@ DeclarationSeparator
     = '\n'
     | ';'
     | EOF
-
 DeclarationType
     = var
     | let
@@ -94,13 +97,29 @@ DeclarationNext
     = ',' DeclarationElem | epsilon
 ```
 
+#### OneLineCommaOperator
+```C
+OneLineCommaOperatorSeparator
+    = '\n'
+    | ';'
+    | EOF
+OneLineCommaOperator
+    = Expression ',' OneLineCommaOperator
+    | Expression
+```
+
 #### Expression
 
 ```C
+Symbol
+    = ident
+    | numberConst
+    | strConst
 Expression
-    = ident ExpressionRest
+    = Symbol ExpressionRest
     | Array ExpressionRest
     | CommaOperator ExpressionRest
+    | FunctionExpression
 ExpressionRest
     = Get
     | Get2
@@ -123,8 +142,11 @@ ArrayElem
     | Expression ']'
     | ',' ArrayElem
     | ']'
-// TODO:
-// CommaOperator
+CommaOperator
+    = '(' CommaOperatorNext
+CommaOperatorNext
+    = Expression ',' CommaOperatorNext
+    | Expression ')'
 
 // particular Expression rests
 Get
@@ -135,10 +157,10 @@ Assignment
     = '=' Expression
 Call
     = '(' CallNextArg
+    | '(' ')'
 CallNextArg
     = Expression ')'
     | Expression ',' CallNextArg
-    | ')'
 Add
     = '+' Expression
 Sub
@@ -153,6 +175,29 @@ And
     = '&' Expression
 Or
     = '|' Expression
+```
+
+### FunctionExpression
+Function expression and definition
+```C
+FunctionExpression
+    = FunctionHead '{' FunctionBody
+FunctionHead
+    = function ident '(' FunctionNextParam
+    | function ident '(' ')'
+    | function '(' FunctionNextParam
+    | function '(' ')'
+FunctionNextParam
+    = ident ',' FunctionNextParam
+    = ident ')'
+FunctionBodySeparator
+    = '\n'
+    = ';'
+FunctionBody
+    = Program FunctionBody
+    | return Expression FunctionBodySeparator FunctionBody
+    | '}'
+
 ```
 
 Building
@@ -207,7 +252,7 @@ Interpreter
 -----------
 
 Interpreter is constructed using Parser object.
-TODO
+Range of possibilities will be defined in later state of the project.
 
 
 Examples
@@ -227,16 +272,80 @@ var a,b,c,d
 var a=1,b,c='test',d
 ```
 
-### Examples - Get:
-Returns 22
+### Examples - OneLineCommaOperator:
+Prints 3
 ```javascript
-[1,22,3,4][0,2,'test',1]
+abc=2, abc++, print(abc)
 ```
 
-Missing JS syntax examples
+### Examples - Get:
+Prints 22
+```javascript
+print([1,22,3,4][0,2,'test',1])
+```
+
+### Examples - Get2:
+Prints "test-join"
+```javascript
+a = ["test", "join"]
+a.join("-")
+print(a)
+```
+
+### Examples - FunctionExpression:
+Prints "abc"
+```javascript
+function fun(){
+    return 'abc'
+}
+fun['call']()
+```
+Prints "abc"
+```javascript
+(1,2,3, (function fun(){print('abc')}))()
+```
+
+
+Not supported JS syntax examples
 --------------------------
 
 Defining maps like:
 ```javascript
 a = {'abc':1, 'def':2}
 ```
+
+Function expressions without '{' '}'
+```javascript
+function fun()print('abc');
+```
+
+### Not supported keywords examples:
+ - break
+ - case
+ - catch
+ - class
+ - continue
+ - debugger
+ - default
+ - delete
+ - do
+ - else
+ - export
+ - extends
+ - finally
+ - for
+ - if
+ - import
+ - in
+ - instanceof
+ - new
+ - super
+ - switch
+ - this
+ - throw
+ - try
+ - typeof
+ - void
+ - while
+ - with
+ - yield
