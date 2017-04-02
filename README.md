@@ -74,6 +74,14 @@ Lexical units
 | 32  | do | |
 | 33  | while | |
 | 34  | for | |
+| 35  | '=' | |
+| 36  | '+=' | |
+| 37  | '-=' | |
+| 38  | '*=' | |
+| 39  | '/=' | |
+| 40  | '^=' | |
+| 41  | '&=' | |
+| 42  | '|=' | |
 
 Syntax
 ------
@@ -153,15 +161,9 @@ Expression
 ExpressionRest
     = Get
     | Get2
-    | Assignment
     | Call
-    | Add
-    | Sub
-    | Mul
-    | Div
-    | Xor
-    | And
-    | Or
+    | ArithmeticOp
+    | AssignmentOp
     | epsilon
 
 // Expression beginnings (Array or CommaOperator in brackets)
@@ -183,28 +185,29 @@ Get
     = '[' Expression ']'
 Get2
     = '.' ident
-Assignment
-    = '=' Expression
 Call
     = '(' CallNextArg
     | '(' ')'
 CallNextArg
     = Expression ')'
     | Expression ',' CallNextArg
-Add
+ArithmeticOp
     = '+' Expression
-Sub
-    = '-' Expression
-Mul
-    = '*' Expression
-Div
-    = '/' Expression
-Xor
-    = '^' Expression
-And
-    = '&' Expression
-Or
-    = '|' Expression
+    | '-' Expression
+    | '*' Expression
+    | '/' Expression
+    | '^' Expression
+    | '&' Expression
+    | '|' Expression
+AssignmentOp
+    = '=' Expression
+    | '+=' Expression
+    | '-=' Expression
+    | '*=' Expression
+    | '/=' Expression
+    | '^=' Expression
+    | '&=' Expression
+    | '|=' Expression
 ```
 
 ### FunctionExpression
@@ -240,8 +243,8 @@ While
 ### For
 ```C
 For
-    = for '(' Declaration ; Expression ; Expression ')' '{' program '}'
-    | for '(' Expression  ; Expression ; Expression ')' '{' program '}'
+    = for '(' Declaration ';' Expression ';' Expression ')' '{' program '}'
+    | for '(' Expression  ';' Expression ';' Expression ')' '{' program '}'
 ```
 
 Building
