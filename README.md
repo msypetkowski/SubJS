@@ -1,51 +1,72 @@
-# SubJS interpreter
-----
+SubJS interpreter
+=================
 
-Project made for TKOM classes.
-Its general functionality is to support analysis of obfuscated (probably malware) JavaScript code, by parsing and interpreting a language that is subset of JavaScript.
+Its general functionality is to support analysis of obfuscated (probably malware) JavaScript code, by:
+ - parsing and interpreting a language that is subset of JavaScript
+ - providing mechanism for execution interrupting when there occur next level of obfuscated code execution
 
-## Interpretable language specification
-----
+Program can detect execution of a code from string object.
+When this situation occur, code (argument of this evaluation) will be saved, and interpretation stopped.
+User can resume interpretation.
 
-###  Some of missing JS syntax
-Defining maps like:
-```javascript
-a = {'abc':1, 'def':2}
-```
 
-###  Lexical units
-- ident
-- strConst
-- numberConst
+Table of contents
+=================
 
-Simple atoms:
+  * [SubJs interpreter](#subjs-interpreter)
+  * [Table of contents](#table-of-contents)
+  * [Interpretable language specification](#interpretable-language-specification)
+    * [Lexical units](#lexical-units)
+    * [Syntax](#syntax)
+  * [Building](#building)
+  * [Running](#running)
+  * [Architecture](#architecture)
+    * [Lexer](#lexer)
+    * [Parser](#parser)
+    * [Interpreter](#interpreter)
+  * [Examples](#examples)
+    * [Interpretable code examples](#interpretable-code-examples)
+    * [Missing JS syntax examples](#missing-js-syntax-examples)
 
-- ','
-- ';'
-- '\n'
-- EOF
-- function
-- class
-- '('
-- ')'
-- '['
-- ']'
-- '}'
-- '{'
-- var
-- let
-- const
-- new
-- '!'
-- '^'
-- '&'
-- '*'
-- '-'
-- '+'
-- '/'
-- '|'
 
-### Syntax
+Interpretable language specification
+====================================
+
+Lexical units
+-------------
+
+| no  | Symbol        | Description   |
+|:--- | :------------ |:-------------:|
+| 0   | ident         | variable, class of function name |
+| 1   | strConst      | constants like "string" |
+| 2   | numberConst   | number |
+| 3   | ',' | |
+| 4   | ';' | |
+| 5   | '\n' | |
+| 6   | EOF | |
+| 7   | function | |
+| 8   | class | |
+| 9   | '(' | |
+| 10  | ')' | |
+| 11  | '[' | |
+| 12  | ']' | |
+| 13  | '}' | |
+| 14   | '{' | |
+| 15  | var | |
+| 16  | let | |
+| 17  | const | |
+| 18  | new | |
+| 19  | '!' | |
+| 20  | '^' | |
+| 21  | '&' | |
+| 22  | '*' | |
+| 23  | '-' | |
+| 24  | '+' | |
+| 25  | '/' | |
+| 26  | '|' | |
+
+Syntax
+------
 
 #### Starting symbol
 ```C
@@ -134,30 +155,24 @@ Or
     = '|' Expression
 ```
 
-
-## Functionality
-----
-Program can detect execution of a code from string object.
-When this situation occur, code (argument of this evaluation) will be saved, and interpretation stopped.
-User can resume interpretation.
-
-## Building
-----
+Building
+========
 TODO
 
-## Running
-----
+Running
+=======
 TODO
 
-## Architecture
-----
+Architecture
+============
 
 There are 3 most important classes:
 1. Lexer
 2. Parser
 3. Interpreter
 
-### Lexer
+Lexer
+-----
 
 Lexer is constructed using string object (code).
 It has run() method, that returns
@@ -179,7 +194,8 @@ Lexer generates 4 symbol tables:
 - for constant integers
 - for constant floating-point numbers
 
-### Parser
+Parser
+------
 
 Parser is constructed using Lexer object.
 Parser has also run() method, that returns the same structure as Lexer.
@@ -187,17 +203,18 @@ Only difference is that integer is number of a token (not position in the text).
 
 Parser has methods to access generated tree.
 
-### Interpreter
+Interpreter
+-----------
 
 Interpreter is constructed using Parser object.
 TODO
 
 
+Examples
+========
 
-## Interpretable code examples
----
-
-TODO
+Interpretable code examples
+---------------------------
 
 ### Examples - Declaration:
 ```javascript
@@ -214,4 +231,12 @@ var a=1,b,c='test',d
 Returns 22
 ```javascript
 [1,22,3,4][0,2,'test',1]
+```
+
+Missing JS syntax examples
+--------------------------
+
+Defining maps like:
+```javascript
+a = {'abc':1, 'def':2}
 ```
