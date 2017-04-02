@@ -65,6 +65,8 @@ Lexical units
 | 25  | '/' | |
 | 26  | '|' | |
 | 27  | return | |
+| 28  | if | |
+| 29  | else | |
 
 Syntax
 ------
@@ -74,8 +76,13 @@ Syntax
 Program
     = Declaration DeclarationSeparator Program
     | OneLineCommaOperator OneLineCommaOperatorSeparator Program
-    | ';'
-    | '\n'
+    | ';' Program
+    | '\n' Program
+    | FunctionExpression Program
+    | IfStatement Program
+    | Symbol ExpressionRest DeclarationSeparator
+    | Array ExpressionRest DeclarationSeparator
+    | CommaOperator ExpressionRest DeclarationSeparator
 ```
 
 #### Declaration
@@ -98,13 +105,16 @@ DeclarationNext
 ```
 
 #### OneLineCommaOperator
+Should contain at least one ','
 ```C
 OneLineCommaOperatorSeparator
     = '\n'
     | ';'
     | EOF
 OneLineCommaOperator
-    = Expression ',' OneLineCommaOperator
+    = Expression ',' OneLineCommaOperatorNext
+OneLineCommaOperatorNext
+    = Expression ',' OneLineCommaOperatorNext
     | Expression
 ```
 
@@ -119,7 +129,7 @@ Expression
     = Symbol ExpressionRest
     | Array ExpressionRest
     | CommaOperator ExpressionRest
-    | FunctionExpression
+    | FunctionExpression ExpressionRest
 ExpressionRest
     = Get
     | Get2
@@ -198,6 +208,13 @@ FunctionBody
     | return Expression FunctionBodySeparator FunctionBody
     | '}'
 
+```
+
+### IfStatement
+```C
+IfStatement
+    = if CommaOperator '{' Program '}'
+    | if CommaOperator '{' Program '}' else '{' Program '}'
 ```
 
 Building
@@ -305,6 +322,39 @@ Prints "abc"
 (1,2,3, (function fun(){print('abc')}))()
 ```
 
+Syntax Error
+```javascript
+function a(){print("abc")} .abc
+```
+
+Syntax Ok
+```javascript
+1, function a(){print("abc")} .abc
+```
+
+### Examples - IfStatement
+Prints 2
+```javascript
+if (1,2,3,0) {print(1)} else {print(2)}
+```
+Prints 1
+```javascript
+if (1,2,3,1) {print(1)} else {print(2)}
+```
+
+
+### Complex examples
+Prints "abc"
+```javascript
+aaa = "aaa"
+ccc = "ccc"
+function abc(param){
+    print("abc")
+}
+abc["aaaccc"] = abc
+abc[aaa + (function fff(){return "ccc";}())](123);
+```
+
 
 Not supported JS syntax examples
 --------------------------
@@ -319,6 +369,11 @@ Function expressions without '{' '}'
 function fun()print('abc');
 ```
 
+If statements without '{' '}'
+```javascript
+if(1)print(1);
+```
+
 ### Not supported keywords examples:
  - break
  - case
@@ -329,12 +384,10 @@ function fun()print('abc');
  - default
  - delete
  - do
- - else
  - export
  - extends
  - finally
  - for
- - if
  - import
  - in
  - instanceof
