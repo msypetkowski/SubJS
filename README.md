@@ -98,10 +98,11 @@ Program
     | Separator Program
     | Program
 
+    | Symbol ExpressionRest DeclarationSeparator Program
+    | Array ExpressionRest DeclarationSeparator Program
+    | CommaOperator ExpressionRest DeclarationSeparator Program
+    | new Expression DeclarationSeparator Program
     | FunctionExpression Program
-    | Symbol ExpressionRest DeclarationSeparator
-    | Array ExpressionRest DeclarationSeparator
-    | CommaOperator ExpressionRest DeclarationSeparator
 
     | IfStatement Program
     | While Program
@@ -161,6 +162,7 @@ Expression
     = Symbol ExpressionRest
     | Array ExpressionRest
     | CommaOperator ExpressionRest
+    | new Expression
     | FunctionExpression ExpressionRest
 ExpressionRest
     = Get
@@ -412,6 +414,8 @@ continue, break and return statements not inside loop/function are not an syntax
 
 Unary operators '--' and '++' works only postfix.
 
+Functions can be used in OneLineCommaOperator (see syntax).
+
 Not supported JS syntax examples
 --------------------------------
 
@@ -442,7 +446,6 @@ Not supported keywords list:
  - import
  - in
  - instanceof
- - new
  - super
  - switch
  - this
