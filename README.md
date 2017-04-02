@@ -26,7 +26,9 @@ Table of contents
     * [Interpreter](#interpreter)
   * [Examples](#examples)
     * [Interpretable code examples](#interpretable-code-examples)
+  * [Differences from JavaScript](#differences-from-javascript)
     * [Not supported JS syntax examples](#not-supported-js-syntax-examples)
+    * [Not supported keywords list](#not-supported-keywords-list)
 
 
 Interpretable language specification
@@ -67,22 +69,33 @@ Lexical units
 | 27  | return | |
 | 28  | if | |
 | 29  | else | |
+| 30  | continue | |
+| 31  | break | |
+| 32  | do | |
+| 33  | while | |
 
 Syntax
 ------
 
 #### Starting symbol
+Starting symbol is Program.
 ```C
 Program
     = Declaration DeclarationSeparator Program
     | OneLineCommaOperator OneLineCommaOperatorSeparator Program
-    | ';' Program
-    | '\n' Program
+    | Separator Program
+    | Program
     | FunctionExpression Program
     | IfStatement Program
     | Symbol ExpressionRest DeclarationSeparator
     | Array ExpressionRest DeclarationSeparator
     | CommaOperator ExpressionRest DeclarationSeparator
+    | continue Separator
+    | break Separator
+    | return Expression Separator
+Separator
+    = ';'
+    | '\n'
 ```
 
 #### Declaration
@@ -191,7 +204,7 @@ Or
 Function expression and definition
 ```C
 FunctionExpression
-    = FunctionHead '{' FunctionBody
+    = FunctionHead '{' Program '}'
 FunctionHead
     = function ident '(' FunctionNextParam
     | function ident '(' ')'
@@ -200,14 +213,6 @@ FunctionHead
 FunctionNextParam
     = ident ',' FunctionNextParam
     = ident ')'
-FunctionBodySeparator
-    = '\n'
-    = ';'
-FunctionBody
-    = Program FunctionBody
-    | return Expression FunctionBodySeparator FunctionBody
-    | '}'
-
 ```
 
 ### IfStatement
@@ -215,6 +220,14 @@ FunctionBody
 IfStatement
     = if CommaOperator '{' Program '}'
     | if CommaOperator '{' Program '}' else '{' Program '}'
+```
+
+### While
+```C
+DoWhile
+    = do '{' Program '}' while CommaOperator
+While
+    = while CommaOperator '{' Program '}'
 ```
 
 Building
@@ -355,9 +368,13 @@ abc["aaaccc"] = abc
 abc[aaa + (function fff(){return "ccc";}())](123);
 ```
 
+Differences from JavaScript
+===========================
+
+continue, break and return statements not inside loop/function are not an syntax error, but this will cause error during interpretation.
 
 Not supported JS syntax examples
---------------------------
+--------------------------------
 
 Defining maps like:
 ```javascript
@@ -374,16 +391,14 @@ If statements without '{' '}'
 if(1)print(1);
 ```
 
-### Not supported keywords examples:
- - break
+Not supported keywords list:
+----------------------------
  - case
  - catch
  - class
- - continue
  - debugger
  - default
  - delete
- - do
  - export
  - extends
  - finally
@@ -399,6 +414,5 @@ if(1)print(1);
  - try
  - typeof
  - void
- - while
  - with
  - yield
