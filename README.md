@@ -41,7 +41,7 @@ Lexical units
 |:--- | :------------ |:-------------:|
 | 0   | ident         | variable, class of function name |
 | 1   | strConst      | constants like "string" |
-| 2   | numberConst   | number |
+| 2   | numberConst   | numbers like: 12 1.66 0x001|
 | 3   | ',' | |
 | 4   | ';' | |
 | 5   | '\n' | |
@@ -65,7 +65,7 @@ Lexical units
 | 23  | '-' | |
 | 24  | '+' | |
 | 25  | '/' | |
-| 26  | '|' | |
+| 26  | '\|' | |
 | 27  | return | |
 | 28  | if | |
 | 29  | else | |
@@ -81,7 +81,10 @@ Lexical units
 | 39  | '/=' | |
 | 40  | '^=' | |
 | 41  | '&=' | |
-| 42  | '|=' | |
+| 42  | '\|=' | |
+| 43  | try | |
+| 44  | catch | |
+| 45  | finally | |
 
 Syntax
 ------
@@ -104,6 +107,7 @@ Program
     | While Program
     | DoWhile Program
     | For Program
+    | Try Program
 
     | continue Separator
     | break Separator
@@ -164,6 +168,8 @@ ExpressionRest
     | Call
     | ArithmeticOp
     | AssignmentOp
+    | '++'
+    | '--'
     | epsilon
 
 // Expression beginnings (Array or CommaOperator in brackets)
@@ -245,6 +251,20 @@ While
 For
     = for '(' Declaration ';' Expression ';' Expression ')' '{' program '}'
     | for '(' Expression  ';' Expression ';' Expression ')' '{' program '}'
+```
+
+### Try, Catch, Finally
+
+```C
+Try
+    = try '{' Program '}' Catch
+Catch
+    = catch '(' ident ')' '{' Program '}' Catch
+    | Finally
+    | epsilon
+Finally
+    = finally '{' Program '}'
+
 ```
 
 Building
@@ -390,6 +410,8 @@ Differences from JavaScript
 
 continue, break and return statements not inside loop/function are not an syntax error, but this will cause error during interpretation.
 
+Unary operators '--' and '++' works only postfix.
+
 Not supported JS syntax examples
 --------------------------------
 
@@ -411,15 +433,12 @@ if(1)print(1);
 Not supported keywords list:
 ----------------------------
  - case
- - catch
  - class
  - debugger
  - default
  - delete
  - export
  - extends
- - finally
- - for
  - import
  - in
  - instanceof
@@ -428,7 +447,6 @@ Not supported keywords list:
  - switch
  - this
  - throw
- - try
  - typeof
  - void
  - with
