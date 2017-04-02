@@ -73,6 +73,7 @@ Lexical units
 | 31  | break | |
 | 32  | do | |
 | 33  | while | |
+| 34  | for | |
 
 Syntax
 ------
@@ -85,11 +86,17 @@ Program
     | OneLineCommaOperator OneLineCommaOperatorSeparator Program
     | Separator Program
     | Program
+
     | FunctionExpression Program
-    | IfStatement Program
     | Symbol ExpressionRest DeclarationSeparator
     | Array ExpressionRest DeclarationSeparator
     | CommaOperator ExpressionRest DeclarationSeparator
+
+    | IfStatement Program
+    | While Program
+    | DoWhile Program
+    | For Program
+
     | continue Separator
     | break Separator
     | return Expression Separator
@@ -228,6 +235,13 @@ DoWhile
     = do '{' Program '}' while CommaOperator
 While
     = while CommaOperator '{' Program '}'
+```
+
+### For
+```C
+For
+    = for '(' Declaration ; Expression ; Expression ')' '{' program '}'
+    | for '(' Expression  ; Expression ; Expression ')' '{' program '}'
 ```
 
 Building
