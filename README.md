@@ -298,10 +298,15 @@ If analysis succeed vector is empty.
 Integer in pair from vector, points position in text where error occured.
 String is error message associated with given position.
 
-Lexer has methods that allow access to generated tokens.
+Lexer provides methods that allow access to generated tokens.
 Token is integer number (numbers all possible tokens - see Interpretable languate specification)
     or pair of integer numbers (second integer is index in symbol table)
 
+Lexer uses stack during analysis, because it have to for example not to generate '\n' token in this case:
+```javascript
+if (1,
+    2)print(1)
+```
 Lexer generates 4 symbol tables:
 - for identificators
 - for constant strings
@@ -315,14 +320,15 @@ Parser is constructed using Lexer object.
 Parser has also run() method, that returns the same structure as Lexer.
 Only difference is that integer is number of a token (not position in the text).
 
-Parser has methods to access generated tree.
+Parser provides methods to access generated tree.
+
+Parser is LL (left-left) type.
 
 Interpreter
 -----------
 
 Interpreter is constructed using Parser object.
 Range of possibilities will be defined in later state of the project.
-
 
 Examples
 ========
