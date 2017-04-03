@@ -96,7 +96,6 @@ Program
     = Declaration DeclarationSeparator Program
     | OneLineCommaOperator OneLineCommaOperatorSeparator Program
     | Separator Program
-    | Program
 
     | Symbol ExpressionRest DeclarationSeparator Program
     | Array ExpressionRest DeclarationSeparator Program
