@@ -85,6 +85,8 @@ Lexical units
 | 43  | try | |
 | 44  | catch | |
 | 45  | finally | |
+| 46  | '==' | |
+| 47  | '!=' | |
 
 Syntax
 ------
@@ -270,11 +272,21 @@ Finally
 
 Building
 ========
-TODO
+Compilation:
+```bash
+scons
+```
+Clean:
+```bash
+scons -c
+```
 
 Running
 =======
-TODO
+See:
+```bash
+./SubJs -h
+```
 
 Architecture
 ============
@@ -288,39 +300,23 @@ Lexer
 -----
 
 Lexer is constructed using string object (code).
-It has run() method, that returns
-```C++
-pair<bool, vector<pair<int,string> > >
-```
-bool is True if analysis succeed, else False.
-If analysis succeed vector is empty.
-Integer in pair from vector, points position in text where error occured.
-String is error message associated with given position.
-
 Lexer provides methods that allow access to generated tokens.
 Token is integer number (numbers all possible tokens - see Interpretable languate specification)
-    or pair of integer numbers (second integer is index in symbol table)
 
 Lexer uses stack during analysis, because it have to for example not to generate '\n' token in this case:
 ```javascript
 if (1,
     2)print(1)
 ```
-Lexer generates 4 symbol tables:
+Lexer generates 2 symbol tables:
 - for identificators
-- for constant strings
-- for constant integers
-- for constant floating-point numbers
+- for constants
 
 Parser
 ------
 
 Parser is constructed using Lexer object.
-Parser has also run() method, that returns the same structure as Lexer.
-Only difference is that integer is number of a token (not position in the text).
-
 Parser provides methods to access generated tree.
-
 Parser is LL (left-left) type.
 
 Interpreter
@@ -437,6 +433,13 @@ function fun()print('abc');
 If statements without '{' '}'
 ```javascript
 if(1)print(1);
+```
+
+Endlines between symbol and expression rest:
+```javascript
+a
+=
+1
 ```
 
 Not supported keywords list:
