@@ -37,56 +37,65 @@ Interpretable language specification
 Lexical units
 -------------
 
-| no  | Symbol        | Description   |
-|:--- | :------------ |:-------------:|
-| 0   | ident         | variable, class of function name |
-| 1   | strConst      | constants like "string" |
-| 2   | numberConst   | numbers like: 12 1.66 0x001|
-| 3   | ',' | |
-| 4   | ';' | |
-| 5   | '\n' | |
-| 6   | EOF | |
-| 7   | function | |
-| 8   | class | |
-| 9   | '(' | |
-| 10  | ')' | |
-| 11  | '[' | |
-| 12  | ']' | |
-| 13  | '}' | |
-| 14   | '{' | |
-| 15  | var | |
-| 16  | let | |
-| 17  | const | |
-| 18  | new | |
-| 19  | '!' | |
-| 20  | '^' | |
-| 21  | '&' | |
-| 22  | '*' | |
-| 23  | '-' | |
-| 24  | '+' | |
-| 25  | '/' | |
-| 26  | '\|' | |
-| 27  | return | |
-| 28  | if | |
-| 29  | else | |
-| 30  | continue | |
-| 31  | break | |
-| 32  | do | |
-| 33  | while | |
-| 34  | for | |
-| 35  | '=' | |
-| 36  | '+=' | |
-| 37  | '-=' | |
-| 38  | '*=' | |
-| 39  | '/=' | |
-| 40  | '^=' | |
-| 41  | '&=' | |
-| 42  | '\|=' | |
-| 43  | try | |
-| 44  | catch | |
-| 45  | finally | |
-| 46  | '==' | |
-| 47  | '!=' | |
+#### No keyword atoms:
+
+| Symbol        | Description   |
+| :------------ |:-------------:|
+| ident         | variable, class of function name |
+| constant      | constants like "string" or 100 or 123.0021 |
+
+#### Keyword atoms:
+
+| no  | Symbol        |
+|:--- | :------------ |
+| 0   | '++' |
+| 1   | '--' |
+| 2   | '.' |
+| 3   | ',' |
+| 4   | ';' |
+| 5   | '\n' |
+| 6   | '$' |
+| 7   | function |
+| 8   | class |
+| 9   | '(' |
+| 10  | ')' |
+| 11  | '[' |
+| 12  | ']' |
+| 13  | '}' |
+| 14  | '{' |
+| 15  | var |
+| 16  | let |
+| 17  | const |
+| 18  | new |
+| 19  | '!' |
+| 20  | '^' |
+| 21  | '&' |
+| 22  | '*' |
+| 23  | '-' |
+| 24  | '+' |
+| 25  | '/' |
+| 26  | '\|' |
+| 27  | return |
+| 28  | if |
+| 29  | else |
+| 30  | continue |
+| 31  | break |
+| 32  | do |
+| 33  | while |
+| 34  | for |
+| 35  | '=' |
+| 36  | '+=' |
+| 37  | '-=' |
+| 38  | '*=' |
+| 39  | '/=' |
+| 40  | '^=' |
+| 41  | '&=' |
+| 42  | '\|=' |
+| 43  | try |
+| 44  | catch |
+| 45  | finally |
+| 46  | '==' |
+| 47  | '!=' |
 
 Syntax
 ------
@@ -124,7 +133,7 @@ Separator
 DeclarationSeparator
     = '\n'
     | ';'
-    | EOF
+    | '$'
 DeclarationType
     = var
     | let
@@ -144,7 +153,7 @@ Should contain at least one ','
 OneLineCommaOperatorSeparator
     = '\n'
     | ';'
-    | EOF
+    | '$'
 OneLineCommaOperator
     = Expression ',' OneLineCommaOperatorNext
 OneLineCommaOperatorNext
@@ -157,8 +166,7 @@ OneLineCommaOperatorNext
 ```C
 Symbol
     = ident
-    | numberConst
-    | strConst
+    | constant
 Expression
     = Symbol ExpressionRest
     | Array ExpressionRest

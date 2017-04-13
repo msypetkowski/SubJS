@@ -9,8 +9,6 @@ string AtomKeyword::getStr()const {
     string str = KEYWORDS_STRINGS[key];
     if (str == "\n")
         ret += "\\n";
-    else if (str == "$")
-        ret += "EOF";
     else ret += str;
     return ret;
 }
@@ -30,12 +28,17 @@ string AtomSymbol::getRepr()const {
     return str;
 }
 
-AtomConstant::AtomConstant(const string& s) {
+AtomConstant::AtomConstant(const string& s, Type t) {
     str = s;
+    type = t;
 }
 
 string AtomConstant::getStr()const {
-    return "Constant: " + str;
+    if (type == Type::String)
+        return "Constant String: " + str;
+    if (type == Type::Integer)
+        return "Constant Integer: " + str;
+    return "Constant Float: " + str;
 }
 
 string AtomConstant::getRepr()const {

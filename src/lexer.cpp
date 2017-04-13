@@ -7,7 +7,12 @@
 
 bool isLetter(char c) {
     return (c >= 'a' && c <= 'z')
-        || (c >= 'A' && c <= 'Z');
+        || (c >= 'A' && c <= 'Z')
+        || c == '_';
+}
+
+bool isNumber(char c) {
+    return (c >= '0' && c <= '9');
 }
 
 bool Lexer::isWhitespace(char c) {
@@ -86,7 +91,67 @@ bool Lexer::getSymbol() {
 }
 
 bool Lexer::getConstant() {
-    // TODO
+    while (isWhitespace(code[pos]))
+        ++pos;
+    char first = code[pos];
+    if (first == '"' || first == '\'') {
+        unsigned newPos = pos + 1;
+        string word = "";
+        while (code[newPos] != '$' && code[newPos] != first) {
+            if (code[newPos] == '\n')
+                return false;
+            word += code[newPos];
+            ++newPos;
+        }
+        if (code[newPos] == '$') {
+            return false;
+        } else {
+            atoms.push_back(new AtomConstant(word, AtomConstant::Type::String));
+            pos = newPos + 1;
+            return true;
+        }
+    }
+
+    if (first == '.') {
+        unsigned newPos = pos + 1;
+        string word = ".";
+        while (code[newPos] != '$' && isNumber(code[newPos])) {
+            word += code[newPos];
+            ++newPos;
+        }
+        if (word == ".")
+            return false;
+        atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
+        pos = newPos;
+        return true;
+    }
+
+    if (isNumber(first)) {
+        unsigned newPos = pos;
+        string word = "";
+        while (code[newPos] != '$' && isNumber(code[newPos])) {
+            word += code[newPos];
+            ++newPos;
+        }
+        if (code[newPos] == '.') {
+            word += code[newPos];
+            ++newPos;
+            while (code[newPos] != '$' && isNumber(code[newPos])) {
+                word += code[newPos];
+                ++newPos;
+            }
+            if (*word.rbegin() == '.')
+                atoms.push_back(new AtomConstant(word.substr(0, word.size()-1),
+                            AtomConstant::Type::Integer));
+            else
+                atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
+        } else {
+            atoms.push_back(new AtomConstant(word, AtomConstant::Type::Integer));
+        }
+        pos = newPos;
+        return true;
+    }
+
     return false;
 }
 
@@ -100,7 +165,7 @@ Lexer::Lexer(const string& code1):
 
 bool Lexer::run(){
     while (pos < code.size()) {
-        if (!getKeyword() && !getSymbol() && !getConstant()) {
+        if (!getConstant() && !getKeyword() && !getSymbol()) {
             if (code[pos] == '$')
                 break;
             // TODO: better error handling

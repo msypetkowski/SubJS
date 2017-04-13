@@ -9,12 +9,12 @@ using std::string;
 // [2]   "numberConst "
 
 const array<string, 48> KEYWORDS_STRINGS = {{
-    "unused",         // unused
-    "unused",         // unused
-    "unused",         // unused
+    "++",        // [0]
+    "--",        // [1]
+    ".",         // [2]
     ",",         // [3]
     ";",         // [4]
-    "unused",         // unused (\n)
+    "unused",    // unused (\n)
     "$",         // [6]
     "function",  // [7]
     "class",     // [8]
@@ -60,6 +60,7 @@ const array<string, 48> KEYWORDS_STRINGS = {{
 }};
 
 const array<char, 18> SPECIAL_CHARACTERS = {{
+    '.',         // [2]
     ',',         // [3]
     ';',         // [4]
     '(',         // [9]
@@ -80,33 +81,38 @@ const array<char, 18> SPECIAL_CHARACTERS = {{
 }};
 
 
-class Atom {
-public:
+struct Atom {
     virtual string getStr()const=0;
     virtual string getRepr()const=0;
 };
 
-class AtomKeyword : public Atom {
+struct AtomKeyword : public Atom {
     unsigned key;
-public:
+
     AtomKeyword(unsigned key);
     virtual string getStr()const;
     virtual string getRepr()const;
 };
 
-class AtomSymbol : public Atom {
+struct AtomSymbol : public Atom {
     string str;
     unsigned id;
-public:
+
     AtomSymbol(const string&, unsigned);
     virtual string getStr()const;
     virtual string getRepr()const;
 };
 
-class AtomConstant : public Atom {
+struct AtomConstant : public Atom {
+    enum Type {
+        String,
+        Integer,
+        Float,
+    };
     string str;
-public:
-    AtomConstant(const string&);
+    Type type;
+
+    AtomConstant(const string&, Type);
     virtual string getStr()const;
     virtual string getRepr()const;
 };
