@@ -1,3 +1,4 @@
+#pragma once
 #include<array>
 #include<string>
 using std::array;
@@ -8,13 +9,13 @@ using std::string;
 // [2]   "numberConst "
 
 const array<string, 48> KEYWORDS_STRINGS = {{
-    "%Not Used",
-    "%Not Used",
-    "%Not Used",
+    "unused",         // unused
+    "unused",         // unused
+    "unused",         // unused
     ",",         // [3]
     ";",         // [4]
-    "\n",        // [5]
-    "\0",        // [6]
+    "unused",         // unused (\n)
+    "$",         // [6]
     "function",  // [7]
     "class",     // [8]
     "(",         // [9]
@@ -58,7 +59,7 @@ const array<string, 48> KEYWORDS_STRINGS = {{
     "!=",        // [47]
 }};
 
-const array<char, 46> SPECIAL_CHARACTERS = {{
+const array<char, 18> SPECIAL_CHARACTERS = {{
     ',',         // [3]
     ';',         // [4]
     '(',         // [9]
@@ -82,6 +83,7 @@ const array<char, 46> SPECIAL_CHARACTERS = {{
 class Atom {
 public:
     virtual string getStr()const=0;
+    virtual string getRepr()const=0;
 };
 
 class AtomKeyword : public Atom {
@@ -89,6 +91,7 @@ class AtomKeyword : public Atom {
 public:
     AtomKeyword(unsigned key);
     virtual string getStr()const;
+    virtual string getRepr()const;
 };
 
 class AtomSymbol : public Atom {
@@ -97,6 +100,7 @@ class AtomSymbol : public Atom {
 public:
     AtomSymbol(const string&, unsigned);
     virtual string getStr()const;
+    virtual string getRepr()const;
 };
 
 class AtomConstant : public Atom {
@@ -104,4 +108,5 @@ class AtomConstant : public Atom {
 public:
     AtomConstant(const string&);
     virtual string getStr()const;
+    virtual string getRepr()const;
 };

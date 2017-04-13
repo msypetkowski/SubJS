@@ -1,3 +1,4 @@
+#pragma once
 #include "atom.h"
 
 #include <string>

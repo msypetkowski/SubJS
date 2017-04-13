@@ -13,12 +13,12 @@ bool isLetter(char c) {
 bool Lexer::isWhitespace(char c) {
     return c == ' '
         || c == '\t'
-        || (treatEndlAsSeparator && c == '\n');
+        || (!treatEndlAsSeparator && c == '\n');
 }
 
 bool Lexer::isSpecial(char c) {
     return std::find(SPECIAL_CHARACTERS.begin(), SPECIAL_CHARACTERS.end(), c) != SPECIAL_CHARACTERS.end()
-        || (!treatEndlAsSeparator && c == '\n');
+        || (treatEndlAsSeparator && c == '\n');
 }
 
 bool Lexer::getKeyword() {
@@ -27,7 +27,7 @@ bool Lexer::getKeyword() {
     unsigned wordEnd = pos;
     if (isLetter(code[pos])) {
         string word;
-        while(isLetter(code[wordEnd])){
+        while(isLetter(code[wordEnd])) {
             word += code[wordEnd];
             ++wordEnd;
         }
@@ -95,16 +95,20 @@ Lexer::Lexer(const string& code1):
         nextNewSymbolId(0),
         pos(0),
         treatEndlAsSeparator(false) {
+    code += '$';
 }
 
 bool Lexer::run(){
     while (pos < code.size()) {
         if (!getKeyword() && !getSymbol() && !getConstant()) {
-            errors.push_back(pos);
+            if (code[pos] == '$')
+                break;
             // TODO: better error handling
+            errors.push_back(pos);
             return false;
         }
     }
+    atoms.push_back(new AtomKeyword(6));
     return true;
 }
 
