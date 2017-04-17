@@ -71,8 +71,9 @@ int main(int argc, char **argv) {
             }
         } else {
             cout << "Errors occured during lexical analysis. Errors:" << endl;
-            for (unsigned a : l.getErrors()) {
-                cout << "at: " << a << endl;
+            for (auto a : l.getErrors()) {
+                cout << "at line: " << a.first + 1 << " ";
+                cout << "at collumnn: " << a.second + 1 << endl;
             }
         }
     } else if (vm.count("parse-only")) {

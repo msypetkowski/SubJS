@@ -11,7 +11,7 @@ using std::map;
 
 class Lexer {
     vector<Atom*> atoms;
-    vector<unsigned> errors;
+    vector<std::pair<unsigned,unsigned>> errors;
     string code;
     unsigned nextNewSymbolId;
     map<string, int> symbolsMap;
@@ -31,5 +31,5 @@ public:
 
     bool run();
     vector<Atom*> getAtoms();
-    vector<unsigned> getErrors();
+    vector<std::pair<unsigned,unsigned>> getErrors();
 };

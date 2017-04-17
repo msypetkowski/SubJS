@@ -96,6 +96,12 @@ Lexical units
 | 45  | finally |
 | 46  | '==' |
 | 47  | '!=' |
+| 48  | '&&' |
+| 49  | '||' |
+| 50  | '<' |
+| 51  | '<=' |
+| 52  | '>' |
+| 53  | '>=' |
 
 Syntax
 ------
@@ -179,8 +185,11 @@ ExpressionRest
     | Call
     | ArithmeticOp
     | AssignmentOp
+    | CmpOp
     | '++'
     | '--'
+    | '&&' Expression
+    | '|| Expression
     | epsilon
 
 // Expression beginnings (Array or CommaOperator in brackets)
@@ -225,6 +234,11 @@ AssignmentOp
     | '^=' Expression
     | '&=' Expression
     | '|=' Expression
+CmpOp
+    = '<' Expression
+    | '<=' Expression
+    | '>' Expression
+    | '>=' Expression
 ```
 
 ### FunctionExpression

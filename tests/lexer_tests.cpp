@@ -1,7 +1,10 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/make_shared.hpp>
 
+#include <boost/range/combine.hpp>
+
 #include <iostream>
+#include <array>
 
 // #define private public
 // #define protected public
@@ -90,6 +93,16 @@ namespace LexerTests
         BOOST_CHECK_EQUAL(atoms[8]->getRepr(), "1.003");
     }
 
+    BOOST_AUTO_TEST_CASE(testNumberConstant2) {
+        string code1 = "0x123 1x1";
+        Lexer l1(code1);
+        BOOST_CHECK(!l1.run());
+
+        string code2 = "0x123 . 1";
+        Lexer l2(code2);
+        BOOST_CHECK(l2.run());
+    }
+
     BOOST_AUTO_TEST_CASE(testFloatConstant) {
         string code = "1.02 .5 12.";
         Lexer l(code);
@@ -123,6 +136,107 @@ namespace LexerTests
 
         BOOST_CHECK_EQUAL(atoms.size(), 11);
         BOOST_CHECK_EQUAL("$" , (*atoms.rbegin())->getRepr());
+        BOOST_CHECK_EQUAL("=" , (atoms[4])->getRepr());
+        BOOST_CHECK_EQUAL("1" , (atoms[5])->getRepr());
     }
 
+    BOOST_AUTO_TEST_CASE(testGeneral2) {
+        string code = " var uradtodeg = \"\\x74h\";\n var um = \"l\\x65ng\";\n var ucollisionend = \"n\\x67th\";\n";
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+
+        BOOST_CHECK_EQUAL(atoms.size(), 15 + 1);
+        BOOST_CHECK_EQUAL("var" , (atoms[0])->getRepr());
+        BOOST_CHECK_EQUAL("uradtodeg" , (atoms[1])->getRepr());
+        BOOST_CHECK_EQUAL("=", (atoms[2])->getRepr());
+        BOOST_CHECK_EQUAL("\\x74h", (atoms[3])->getRepr());
+
+        BOOST_CHECK_EQUAL("n\\x67th", (atoms[13])->getRepr());
+        BOOST_CHECK_EQUAL(";", (atoms[14])->getRepr());
+        BOOST_CHECK_EQUAL("$", (atoms[15])->getRepr());
+    }
+
+    BOOST_AUTO_TEST_CASE(testGeneral3) {
+        string code = "acollisionend[(function mmi(){return mothumbnailslist;}()) + mhtc + mrenderer](bmsg, 8740 - 8738);";
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+
+        BOOST_CHECK_EQUAL(atoms.size(), 28 + 1);
+
+        BOOST_CHECK_EQUAL("mothumbnailslist", (atoms[9])->getRepr());
+        BOOST_CHECK_EQUAL("8738", (atoms[25])->getRepr());
+        BOOST_CHECK_EQUAL(")", (atoms[26])->getRepr());
+        BOOST_CHECK_EQUAL(";", (atoms[27])->getRepr());
+        BOOST_CHECK_EQUAL("$", (atoms[28])->getRepr());
+    }
+
+    BOOST_AUTO_TEST_CASE(testGeneral4) {
+        string code = R"foo(
+function radtodeg(arenderer)
+{
+	if (arenderer[0] == 0x4D && arenderer[1] == 0x5a)
+		{return true;}
+)foo";
+
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+
+        BOOST_CHECK_EQUAL(atoms.size(), 27 + 1);
+        BOOST_CHECK_EQUAL("function", atoms[0]->getRepr());
+        BOOST_CHECK_EQUAL("{", atoms[5]->getRepr());
+        BOOST_CHECK_EQUAL("(", atoms[7]->getRepr());
+        BOOST_CHECK_EQUAL("0x4D", atoms[13]->getRepr());
+        BOOST_CHECK_EQUAL("&&", atoms[14]->getRepr());
+        BOOST_CHECK_EQUAL("0x5a", atoms[20]->getRepr());
+        BOOST_CHECK(dynamic_cast<AtomConstant*>(atoms[20]));
+        BOOST_CHECK_EQUAL(")", atoms[21]->getRepr());
+        BOOST_CHECK_EQUAL("{", atoms[22]->getRepr());
+        BOOST_CHECK_EQUAL("true", atoms[24]->getRepr());
+    }
+
+    BOOST_AUTO_TEST_CASE(testGeneral5) {
+        string code = R"foo(
+var ami = new Array();
+for (var mi = 0; mi < htc[jmsg(idoxie) + jcollisionend(imsg) + iparticleradius]; mi++)
+{
+    var renderer = htc.charCodeAt(mi);
+    if (renderer < 128)
+        {var atends = renderer;}
+    else
+        {var atends = am[renderer];}
+    ami.push(atends);
+};
+)foo";
+        std::array<string, 80> expectedAtoms = {{
+            "var", "ami", "=", "new", "Array", "(", ")",
+            ";", "for", "(", "var", "mi", "=", "0",
+            ";", "mi", "<", "htc", "[", "jmsg", "(", "idoxie",
+            ")", "+", "jcollisionend", "(", "imsg", ")",
+            "+", "iparticleradius", "]", ";", "mi", "++",
+            ")", "{", "var", "renderer", "=", "htc", ".",
+            "charCodeAt", "(", "mi", ")", ";", "if", "(",
+            "renderer", "<", "128", ")", "{", "var", "atends", "=",
+            "renderer", ";", "}", "else", "{", "var", "atends", "=",
+            "am", "[", "renderer", "]", ";", "}", "ami",
+            ".", "push", "(", "atends", ")", ";", "}", ";", "$",
+        }};
+
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 80);
+
+        for (auto tup : boost::combine(atoms, expectedAtoms)) {
+            string s;
+            Atom* a;
+            boost::tie(a,s) = tup;
+            BOOST_CHECK_EQUAL(a->getRepr(), s);
+        }
+    }
 }

@@ -11,8 +11,17 @@ bool isLetter(char c) {
         || c == '_';
 }
 
+bool isHexLetter(char c) {
+    return (c >= 'a' && c <= 'f')
+        || (c >= 'A' && c <= 'F');
+}
+
 bool isNumber(char c) {
     return (c >= '0' && c <= '9');
+}
+
+bool isEndl(char c) {
+    return c == '\n';
 }
 
 bool Lexer::isWhitespace(char c) {
@@ -145,9 +154,22 @@ bool Lexer::getConstant() {
                             AtomConstant::Type::Integer));
             else
                 atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
-        } else {
+        } else if(code[newPos] == 'x' && word == "0") {
+            word += code[newPos];
+            ++newPos;
+            while (code[newPos] != '$' &&
+                    (isNumber(code[newPos]) || isHexLetter(code[newPos]))) {
+                word += code[newPos];
+                ++newPos;
+            }
+            if (*word.rbegin() == 'x')
+                return false;
+            else
+                atoms.push_back(new AtomConstant(word,
+                            AtomConstant::Type::Integer));
+        } else if (!isLetter(code[newPos])) {
             atoms.push_back(new AtomConstant(word, AtomConstant::Type::Integer));
-        }
+        } else return false;
         pos = newPos;
         return true;
     }
@@ -164,12 +186,27 @@ Lexer::Lexer(const string& code1):
 }
 
 bool Lexer::run(){
+    vector<int> lastEndl;
+    vector<int> line;
+    lastEndl.resize(code.size());
+    line.resize(code.size());
+    lastEndl[0] = -1;
+    line[0] = 0;
+    for(unsigned i = 1; i < code.size(); ++i) {
+        if (isEndl(code[i])) {
+            lastEndl[i] = i;
+            line[i] = line[i-1] + 1;
+        } else {
+            lastEndl[i] = lastEndl[i - 1];
+            line[i] = line[i-1];
+        }
+    }
     while (pos < code.size()) {
         if (!getConstant() && !getKeyword() && !getSymbol()) {
             if (code[pos] == '$')
                 break;
-            // TODO: better error handling
-            errors.push_back(pos);
+            errors.push_back({line[pos], pos - lastEndl[pos]});
+            // TODO: don't break, skip line
             return false;
         }
     }
@@ -181,6 +218,6 @@ vector<Atom*> Lexer::getAtoms() {
     return atoms;
 }
 
-vector<unsigned> Lexer::getErrors() {
+vector<std::pair<unsigned,unsigned>> Lexer::getErrors() {
     return errors;
 }
