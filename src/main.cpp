@@ -75,6 +75,10 @@ int main(int argc, char **argv) {
                 cout << "at line: " << a.first + 1 << " ";
                 cout << "at collumnn: " << a.second + 1 << endl;
             }
+            // cout << "Found atoms: " << endl;
+            // for (Atom* a : l.getAtoms()) {
+            //     cout << a->getStr() << endl;
+            // }
         }
     } else if (vm.count("parse-only")) {
         cout << "Parsing is not implemented" << endl;

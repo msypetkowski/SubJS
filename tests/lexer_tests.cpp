@@ -63,7 +63,7 @@ namespace LexerTests
         BOOST_CHECK_EQUAL(atoms.size(), 7);
     }
 
-    BOOST_AUTO_TEST_CASE(testStringConstant) {
+    BOOST_AUTO_TEST_CASE(testStringConstant1) {
         string code = "var a = 'text'";
         Lexer l(code);
 
@@ -74,6 +74,33 @@ namespace LexerTests
         BOOST_CHECK(dynamic_cast<AtomConstant*>(atoms[3])->type ==
                 AtomConstant::Type::String);
         BOOST_CHECK_EQUAL(atoms[3]->getRepr(), "text");
+    }
+
+    BOOST_AUTO_TEST_CASE(testStringConstant2) {
+        string code = "var a = 'text \\n \"text\"'";
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 5);
+        BOOST_CHECK(dynamic_cast<AtomConstant*>(atoms[3]));
+        BOOST_CHECK(dynamic_cast<AtomConstant*>(atoms[3])->type ==
+                AtomConstant::Type::String);
+        BOOST_CHECK_EQUAL(atoms[3]->getRepr(), "text \\n \"text\"");
+    }
+
+    BOOST_AUTO_TEST_CASE(testStringConstant3) {
+        string code = R"foo(
+var a='"some" \n "reversed" var a="string"'["split"]('')["reverse"]()["join"]('');
+        )foo";
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 22 + 1);
+        BOOST_CHECK_EQUAL(atoms[3]->getRepr(), R"foo("some" \n "reversed" var a="string")foo");
+        BOOST_CHECK_EQUAL(atoms[5]->getRepr(), "split");
+        BOOST_CHECK_EQUAL(atoms[8]->getRepr(), "");
     }
 
     BOOST_AUTO_TEST_CASE(testNumberConstant) {
@@ -125,6 +152,17 @@ namespace LexerTests
         BOOST_CHECK(dynamic_cast<AtomConstant*>(atoms[2])->type ==
                 AtomConstant::Type::Integer);
         BOOST_CHECK_EQUAL(atoms[2]->getRepr(), "12");
+    }
+    BOOST_AUTO_TEST_CASE(testSymbolAtom) {
+        string code = "_1 abc fda1__4";
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 4);
+        atoms.pop_back();
+        for(auto a : atoms) {
+            BOOST_CHECK(dynamic_cast<AtomSymbol*>(a));
+        }
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral1) {

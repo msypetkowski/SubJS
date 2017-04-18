@@ -86,9 +86,11 @@ bool Lexer::getSymbol() {
     while (isWhitespace(code[pos]))
         ++pos;
     string word;
-    while(isLetter(code[pos])){
-        word += code[pos];
-        ++pos;
+    if (isLetter(code[pos])){
+        while(isLetter(code[pos]) || isNumber(code[pos])){
+            word += code[pos];
+            ++pos;
+        }
     }
     if (word != "") {
         if (symbolsMap.find(word) == symbolsMap.end()) {
