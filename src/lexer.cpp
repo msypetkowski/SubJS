@@ -27,6 +27,7 @@ bool isEndl(char c) {
 bool Lexer::isWhitespace(char c) {
     return c == ' '
         || c == '\t'
+        || c == '\r'
         || (!treatEndlAsSeparator && c == '\n');
 }
 
@@ -149,11 +150,16 @@ bool Lexer::getConstant() {
                 word += code[newPos];
                 ++newPos;
             }
-            if (*word.rbegin() == '.')
-                atoms.push_back(new AtomConstant(word.substr(0, word.size()-1),
-                            AtomConstant::Type::Integer));
-            else
+            if (*word.rbegin() == '.') {
+                if (!isLetter(code[newPos])) {
+                    atoms.push_back(new AtomConstant(word.substr(0, word.size()-1),
+                                AtomConstant::Type::Integer));
+                } else {
+                    return false;
+                }
+            } else {
                 atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
+            }
         } else if(code[newPos] == 'x' && word == "0") {
             word += code[newPos];
             ++newPos;
@@ -162,11 +168,14 @@ bool Lexer::getConstant() {
                 word += code[newPos];
                 ++newPos;
             }
-            if (*word.rbegin() == 'x')
+            if (*word.rbegin() == 'x') {
                 return false;
-            else
+            } else {
+                if (!isLetter(code[newPos])) {
                 atoms.push_back(new AtomConstant(word,
                             AtomConstant::Type::Integer));
+                } else return false;
+            }
         } else if (!isLetter(code[newPos])) {
             atoms.push_back(new AtomConstant(word, AtomConstant::Type::Integer));
         } else return false;
@@ -205,13 +214,16 @@ bool Lexer::run(){
         if (!getConstant() && !getKeyword() && !getSymbol()) {
             if (code[pos] == '$')
                 break;
-            errors.push_back({line[pos], pos - lastEndl[pos]});
-            // TODO: don't break, skip line
-            return false;
+
+            errors.push_back({line[pos], pos - lastEndl[pos] - 1});
+            while(!isWhitespace(code[pos]))
+                ++pos;
         }
     }
     atoms.push_back(new AtomKeyword(6));
-    return true;
+    if (errors.empty())
+        return true;
+    else return false;
 }
 
 vector<Atom*> Lexer::getAtoms() {

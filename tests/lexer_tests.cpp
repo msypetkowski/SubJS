@@ -239,4 +239,32 @@ for (var mi = 0; mi < htc[jmsg(idoxie) + jcollisionend(imsg) + iparticleradius];
             BOOST_CHECK_EQUAL(a->getRepr(), s);
         }
     }
+
+    BOOST_AUTO_TEST_CASE(testFail1) {
+        string code = R"foo(
+var ami = new Array();
+for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradius]; mi++)
+{
+    var 1renderer = htc.charCodeAt(mi);
+    if (renderer < 0x12h)
+        {var atends = renderer;}
+    else
+        {var atends = am[renderer];}
+    ami.push(atends);
+};
+)foo";
+        Lexer l(code);
+        BOOST_CHECK(!l.run());
+        auto errors = l.getErrors();
+        BOOST_CHECK_EQUAL(errors.size(), 4);
+        BOOST_CHECK_EQUAL(errors[0].first, 1);
+        BOOST_CHECK_EQUAL(errors[0].second, 14);
+        BOOST_CHECK_EQUAL(errors[1].first, 1);
+        BOOST_CHECK_EQUAL(errors[1].second, 56);
+        BOOST_CHECK_EQUAL(errors[2].first, 3);
+        BOOST_CHECK_EQUAL(errors[2].second, 8);
+        BOOST_CHECK_EQUAL(errors[3].first, 4);
+        BOOST_CHECK_EQUAL(errors[3].second, 19);
+    }
+
 }
