@@ -109,7 +109,14 @@ bool Lexer::getConstant() {
     if (first == '"' || first == '\'') {
         unsigned newPos = pos + 1;
         string word = "";
-        while (code[newPos] != '$' && code[newPos] != first) {
+        while (code[newPos] != '$') {
+            if (code[newPos] == first) {
+                unsigned count = 1;
+                while(code[newPos - count] == '\\')
+                    ++count;
+                if (count&1)
+                    break;
+            }
             if (code[newPos] == '\n')
                 return false;
             word += code[newPos];

@@ -103,6 +103,30 @@ var a='"some" \n "reversed" var a="string"'["split"]('')["reverse"]()["join"](''
         BOOST_CHECK_EQUAL(atoms[8]->getRepr(), "");
     }
 
+    BOOST_AUTO_TEST_CASE(testStringConstant4) {
+        string code = R"foo(
+a='foo\'' b="\"foo\\" c='foo\\\''
+        )foo";
+        Lexer l(code);
+
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 9 + 1);
+        BOOST_CHECK_EQUAL(atoms[2]->getRepr(), R"(foo\')");
+        BOOST_CHECK_EQUAL(atoms[5]->getRepr(), R"(\"foo\\)");
+        BOOST_CHECK_EQUAL(atoms[8]->getRepr(), R"(foo\\\')");
+    }
+
+    BOOST_AUTO_TEST_CASE(testStringConstant5) {
+        string code = R"foo(
+a='foo\'' b="\"foo\\" c='notClosed\'
+        )foo";
+        Lexer l(code);
+
+        BOOST_CHECK(!l.run());
+        BOOST_CHECK_EQUAL(l.getErrors().size(), 1);
+    }
+
     BOOST_AUTO_TEST_CASE(testNumberConstant) {
         string code = "var a = 123 ; var b = 1.003";
         Lexer l(code);
