@@ -3,17 +3,14 @@
 #include<string>
 using std::array;
 using std::string;
-// [0]   "ident  "
-// [1]   "strConst    "
-// [2]   "numberConst "
 
-const array<string, 54> KEYWORDS_STRINGS = {{
+const array<string, 56> KEYWORDS_STRINGS = {{
     "++",        // [0]
     "--",        // [1]
     ".",         // [2]
     ",",         // [3]
     ";",         // [4]
-    "unused",    // unused (\n)
+    "___unused", // unused (\n)
     "$",         // [6]
     "function",  // [7]
     "class",     // [8]
@@ -62,9 +59,11 @@ const array<string, 54> KEYWORDS_STRINGS = {{
     "<=",        // [51]
     ">",         // [52]
     ">=",        // [53]
+    "%",         // [54]
+    "%=",        // [55]
 }};
 
-const array<char, 20> SPECIAL_CHARACTERS = {{
+const array<char, 21> SPECIAL_CHARACTERS = {{
     '.',         // [2]
     ',',         // [3]
     ';',         // [4]
@@ -85,6 +84,7 @@ const array<char, 20> SPECIAL_CHARACTERS = {{
     '=',         // [35]
     '<',         // [50]
     '>',         // [52]
+    '%',         // [54]
 }};
 
 

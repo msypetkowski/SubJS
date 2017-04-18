@@ -102,6 +102,8 @@ Lexical units
 | 51  | '<=' |
 | 52  | '>' |
 | 53  | '>=' |
+| 54  | '%' |
+| 55  | '%=' |
 
 Syntax
 ------
@@ -225,6 +227,7 @@ ArithmeticOp
     | '^' Expression
     | '&' Expression
     | '|' Expression
+    | '%' Expression
 AssignmentOp
     = '=' Expression
     | '+=' Expression
@@ -234,6 +237,7 @@ AssignmentOp
     | '^=' Expression
     | '&=' Expression
     | '|=' Expression
+    | '%=' Expression
 CmpOp
     = '<' Expression
     | '<=' Expression
