@@ -16,6 +16,9 @@ class Lexer {
     unsigned nextNewSymbolId;
     map<string, int> symbolsMap;
 
+    vector<int> lastEndl;
+    vector<int> line;
+
     // state variables
     unsigned pos;
     bool treatEndlAsSeparator;
@@ -25,6 +28,7 @@ class Lexer {
     bool getKeyword();
     bool getSymbol();
     bool getConstant();
+    bool getComment();
 
 public:
     Lexer(const string&);

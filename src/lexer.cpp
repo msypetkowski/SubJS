@@ -186,6 +186,34 @@ bool Lexer::getConstant() {
     return false;
 }
 
+bool Lexer::getComment(){
+    while (isWhitespace(code[pos]))
+        ++pos;
+    if (code[pos] == '/' && code[pos+1] == '/') {
+        while (code[pos] != '\n' && code[pos] != '$')
+            ++pos;
+        return true;
+    }
+
+    if (code[pos] == '/' && code[pos+1] == '*') {
+        unsigned newPos = pos + 2;
+        while ((code[newPos] != '*' ||  code[newPos+1] != '/')
+                    && code[newPos+1] != '$'
+                ) {
+            ++newPos;
+        }
+        if (code[newPos + 1] == '$') {
+            errors.push_back({line[pos], pos - lastEndl[pos] - 1});
+            pos = newPos + 1;
+            return false;
+        } else {
+            pos = newPos + 2;
+            return true;
+        }
+    }
+    return false;
+}
+
 Lexer::Lexer(const string& code1):
         code(code1),
         nextNewSymbolId(0),
@@ -195,8 +223,6 @@ Lexer::Lexer(const string& code1):
 }
 
 bool Lexer::run(){
-    vector<int> lastEndl;
-    vector<int> line;
     lastEndl.resize(code.size());
     line.resize(code.size());
     lastEndl[0] = -1;
@@ -211,7 +237,7 @@ bool Lexer::run(){
         }
     }
     while (pos < code.size()) {
-        if (!getConstant() && !getKeyword() && !getSymbol()) {
+        if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
             if (code[pos] == '$')
                 break;
 

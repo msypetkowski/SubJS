@@ -267,4 +267,46 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
         BOOST_CHECK_EQUAL(errors[3].second, 19);
     }
 
+    BOOST_AUTO_TEST_CASE(testComments1) {
+        string code = "a = 1 // this \r \t  is comment ***";
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 4);
+    }
+
+    BOOST_AUTO_TEST_CASE(testComments2) {
+        string code = "a = 1 /* /* this is comment ***/  a*4";
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 7);
+    }
+
+    BOOST_AUTO_TEST_CASE(testComments3) {
+        string code = "a = 1 /* *** this is not closed \n \t comment";
+        Lexer l(code);
+        BOOST_CHECK(!l.run());
+        auto errors = l.getErrors();
+        BOOST_CHECK_EQUAL(errors.size(), 1);
+        BOOST_CHECK_EQUAL(errors[0].first, 0);
+        BOOST_CHECK_EQUAL(errors[0].second, 6);
+    }
+
+    BOOST_AUTO_TEST_CASE(testComments4) {
+        string code = R"foo(
+a/* *** this comment ****/ b // "this is comment too"
+c // comment      d e f // * */ /*
+d
+        )foo";
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+        BOOST_CHECK_EQUAL(atoms.size(), 4 + 1);
+        BOOST_CHECK_EQUAL("a",atoms[0]->getRepr());
+        BOOST_CHECK_EQUAL("b",atoms[1]->getRepr());
+        BOOST_CHECK_EQUAL("c",atoms[2]->getRepr());
+        BOOST_CHECK_EQUAL("d",atoms[3]->getRepr());
+        BOOST_CHECK_EQUAL("$",atoms[4]->getRepr());
+    }
 }
