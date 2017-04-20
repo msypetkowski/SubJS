@@ -33,7 +33,13 @@ class Lexer {
 public:
     Lexer(const string&);
 
-    bool run();
+    Atom* getNextAtom();
+
     vector<Atom*> getAtoms();
     vector<std::pair<unsigned,unsigned>> getErrors();
+
+    // run lexical analysis to the end of file
+    // results can be get using getAtoms
+    // and getErrors methods
+    bool run();
 };

@@ -229,9 +229,8 @@ Lexer::Lexer(const string& code1):
         pos(0),
         treatEndlAsSeparator(false) {
     code += '$';
-}
 
-bool Lexer::run(){
+    // for finding error rows and collumns
     lastEndl.resize(code.size());
     line.resize(code.size());
     lastEndl[0] = -1;
@@ -245,6 +244,9 @@ bool Lexer::run(){
             line[i] = line[i-1];
         }
     }
+}
+
+bool Lexer::run(){
     while (pos < code.size()) {
         if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
             if (code[pos] == '$')
@@ -255,6 +257,8 @@ bool Lexer::run(){
                 ++pos;
         }
     }
+
+    // end of file
     atoms.push_back(new AtomKeyword(6));
     if (errors.empty())
         return true;
@@ -267,4 +271,24 @@ vector<Atom*> Lexer::getAtoms() {
 
 vector<std::pair<unsigned,unsigned>> Lexer::getErrors() {
     return errors;
+}
+
+Atom* Lexer::getNextAtom() {
+    if (code[pos] == '$'){
+        throw string("Trying to get atom after end of file.");
+    }
+
+    if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
+        if (code[pos] == '$'){
+            atoms.push_back(new AtomKeyword(6));
+            return *atoms.rbegin();
+        }
+
+        errors.push_back({line[pos], pos - lastEndl[pos] - 1});
+        while(!isWhitespace(code[pos]))
+            ++pos;
+        return nullptr;
+    } else {
+        return *atoms.rbegin();
+    }
 }

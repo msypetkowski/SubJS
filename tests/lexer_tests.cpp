@@ -371,4 +371,34 @@ d
         BOOST_CHECK_EQUAL("d",atoms[3]->getRepr());
         BOOST_CHECK_EQUAL("$",atoms[4]->getRepr());
     }
+
+    BOOST_AUTO_TEST_CASE(testGetAtom) {
+        string code = R"foo(
+for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticleradius]; mi++)
+{
+    atends = arenderer[mi];
+    if (atends < (-1909 + 2037)) 
+        {renderer = atends;}
+    else 
+        {renderer = othumbnailslist[atends];}
+    aflexwhitespace.push(String.fromCharCode(renderer));
+}
+)foo";
+
+        Lexer l(code);
+        BOOST_CHECK(l.run());
+        auto atoms = l.getAtoms();
+
+        Lexer l2(code);
+
+        Atom* newAtom = l2.getNextAtom();
+        int i=0;
+        while (newAtom->getRepr() != "$") {
+            BOOST_CHECK_EQUAL(newAtom->getRepr(), atoms[i]->getRepr());
+            ++i;
+            newAtom = l2.getNextAtom();
+        }
+
+        BOOST_CHECK_THROW(l2.getNextAtom(), string);
+    }
 }
