@@ -53,7 +53,7 @@ Lexical units
 | 2   | '.' |
 | 3   | ',' |
 | 4   | ';' |
-| 5   | '\n' |
+| 5   | '__unused_symbol' |
 | 6   | '$' |
 | 7   | function |
 | 8   | class |
@@ -133,13 +133,13 @@ Program
     | return Expression Separator
 Separator
     = ';'
-    | '\n'
+    | epsilon
 ```
 
 #### Declaration
 ```C
 DeclarationSeparator
-    = '\n'
+    = epsilon
     | ';'
     | '$'
 DeclarationType
@@ -159,7 +159,7 @@ DeclarationNext
 Should contain at least one ','
 ```C
 OneLineCommaOperatorSeparator
-    = '\n'
+    = epsilon
     | ';'
     | '$'
 OneLineCommaOperator
@@ -326,17 +326,11 @@ Lexer
 -----
 
 Lexer is constructed using string object (code).
-Lexer provides methods that allow access to generated tokens.
-Token is integer number (numbers all possible tokens - see Interpretable languate specification)
 
-Lexer uses stack during analysis, because it have to for example not to generate '\n' token in this case:
-```javascript
-if (1,
-    2)print(1)
-```
-Lexer generates 2 symbol tables:
-- for identificators
-- for constants
+Lexer generates 3 types of tokens:
+- symbol (like variable name)
+- constant (like 123 or "text")
+- keyword (like "for", "if", "+=" ...)
 
 Parser
 ------
@@ -437,11 +431,29 @@ abc[aaa + (function fff(){return "ccc";}())](123);
 Differences from JavaScript
 ===========================
 
-continue, break and return statements not inside loop/function are not an syntax error, but this will cause error during interpretation.
+continue, break and return statements not inside loop/function are not an syntax error, but will cause error during interpretation.
 
 Unary operators '--' and '++' works only postfix.
 
 Functions can be used in OneLineCommaOperator (see syntax).
+
+There is no endline token. For example this code:
+```javascript
+a = 1 b = 1
+```
+Will work in this interpreter, but it doesn't run in JavaScript.
+This difference simplifies the syntax. Let's look at these examples:
+```javascript
+a
+=
+1
+```
+```javascript
+a
+[0]
+```
+These are valid JavaScript examples.
+In the second example [0] there is actually get(0) operator, not an list.
 
 Not supported JS syntax examples
 --------------------------------
@@ -459,13 +471,6 @@ function fun()print('abc');
 If statements without '{' '}'
 ```javascript
 if(1)print(1);
-```
-
-Endlines between symbol and expression rest:
-```javascript
-a
-=
-1
 ```
 
 Not supported keywords list:
