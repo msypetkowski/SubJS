@@ -112,14 +112,14 @@ Syntax
 Starting symbol is Program.
 ```C
 Program
-    = Declaration DeclarationSeparator Program
+    = Declaration Program
     | OneLineCommaOperator OneLineCommaOperatorSeparator Program
     | Separator Program
 
-    | Symbol ExpressionRest DeclarationSeparator Program
-    | Array ExpressionRest DeclarationSeparator Program
-    | CommaOperator ExpressionRest DeclarationSeparator Program
-    | new Expression DeclarationSeparator Program
+    | Symbol ExpressionRest Program
+    | Array ExpressionRest Program
+    | CommaOperator ExpressionRest Program
+    | new Expression Program
     | FunctionExpression Program
 
     | IfStatement Program
@@ -138,21 +138,15 @@ Separator
 
 #### Declaration
 ```C
-DeclarationSeparator
-    = epsilon
-    | ';'
-    | '$'
 DeclarationType
     = var
     | let
     | const
 Declaration
-    = DeclarationType DeclarationElem DeclarationNext
+    = DeclarationType DeclarationElem { ',' DeclarationElem }
 DeclarationElem
     = ident '=' Expression
     | ident
-DeclarationNext
-    = ',' DeclarationElem | epsilon
 ```
 
 #### OneLineCommaOperator

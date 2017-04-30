@@ -372,7 +372,7 @@ d
         BOOST_CHECK_EQUAL("$",atoms[4]->getRepr());
     }
 
-    BOOST_AUTO_TEST_CASE(testGetAtom) {
+    BOOST_AUTO_TEST_CASE(testGetAtom1) {
         string code = R"foo(
 for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticleradius]; mi++)
 {
@@ -400,5 +400,52 @@ for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticlerad
         }
 
         BOOST_CHECK_THROW(l2.getNextAtom(), string);
+    }
+
+    BOOST_AUTO_TEST_CASE(testGetAtom2) {
+        string code = "var a=1";
+        Lexer l(code);
+
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "var");
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "a");
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "=");
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "1");
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "$");
+
+        BOOST_CHECK_THROW(l.getNextAtom(), string);
+    }
+
+    BOOST_AUTO_TEST_CASE(testGetLastError) {
+        string code = "a = 1a 4 1.g";
+        Lexer l(code);
+
+        // a
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "a");
+        BOOST_CHECK_THROW(l.getLastError(), string);
+
+        // =
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "=");
+        BOOST_CHECK_THROW(l.getLastError(), string);
+
+        // 1a
+        BOOST_CHECK_EQUAL(l.getNextAtom(), (void*)nullptr);
+        std::pair<unsigned,unsigned> p = std::pair<unsigned,unsigned>({0,4});
+        BOOST_CHECK(l.getLastError() == p);
+        BOOST_CHECK(l.getLastError() == p);
+
+        // 4
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "4");
+        BOOST_CHECK(l.getLastError() == p);
+
+        // 1.g
+        BOOST_CHECK_EQUAL(l.getNextAtom(), (void*)nullptr);
+        std::pair<unsigned,unsigned> p2 = std::pair<unsigned,unsigned>({0,9});
+        BOOST_CHECK(l.getLastError() == p2);
+
+        // $
+        BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "$");
+        BOOST_CHECK(l.getLastError() == p2);
+
+        BOOST_CHECK_THROW(l.getNextAtom(), string);
     }
 }

@@ -274,8 +274,12 @@ vector<std::pair<unsigned,unsigned>> Lexer::getErrors() {
 }
 
 Atom* Lexer::getNextAtom() {
-    if (code[pos] == '$'){
+    if (!atoms.empty() && (*atoms.rbegin())->getRepr() == "$") {
         throw string("Trying to get atom after end of file.");
+    }
+    if (pos >= code.size()) {
+        atoms.push_back(new AtomKeyword(6));
+        return *atoms.rbegin();
     }
 
     if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
@@ -291,4 +295,10 @@ Atom* Lexer::getNextAtom() {
     } else {
         return *atoms.rbegin();
     }
+}
+
+std::pair<unsigned,unsigned> Lexer::getLastError() {
+    if (errors.empty())
+        throw string("Trying to get error while there is no errors.");
+    return *errors.rbegin();
 }

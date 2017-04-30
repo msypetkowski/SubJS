@@ -34,6 +34,7 @@ public:
     Lexer(const string&);
 
     Atom* getNextAtom();
+    std::pair<unsigned,unsigned> getLastError();
 
     vector<Atom*> getAtoms();
     vector<std::pair<unsigned,unsigned>> getErrors();

@@ -1,9 +1,11 @@
 #include "lexer.h"
+#include "parser.h"
 
 #include <iostream>
 #include <fstream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/range/combine.hpp>
 namespace po = boost::program_options;
 using std::cout;
 using std::endl;
@@ -58,7 +60,7 @@ int main(int argc, char **argv) {
         buffer << t.rdbuf();
         code = buffer.str();
     } else {
-        std::cout << "No code is given. Exiting." <<endl;
+        std::cout << "Interactive mode not implemented." <<endl;
         return 1;
     }
 
@@ -81,7 +83,26 @@ int main(int argc, char **argv) {
             // }
         }
     } else if (vm.count("parse-only")) {
-        cout << "Parsing is not implemented" << endl;
+        Lexer l(code);
+        Parser p(l);
+        p.Program();
+        if (p.getErrorsMessages().empty()) {
+            cout << "Syntax tree:" << endl;
+            cout << p.getTreeStr();
+        } else {
+            cout << "Errors:" << endl;
+            assert(p.getErrorsPositions().size() == p.getErrorsMessages().size());
+            for (auto tup : boost::combine(
+                        p.getErrorsPositions(), p.getErrorsMessages())) {
+                std::pair<unsigned, unsigned> pos;
+                string msg;
+                boost::tie(pos,msg) = tup;
+                cout << msg << endl;
+                cout << "at line: " << pos.first + 1 << " ";
+                cout << "at collumnn: " << pos.second + 1 << endl;
+                cout << endl;
+            }
+        }
     } else {
         cout << "Interpretation is not implemented" << endl;
     }
