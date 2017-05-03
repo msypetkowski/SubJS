@@ -11,7 +11,7 @@ static std::map<string, int> createKeywordsMap() {
 }
 std::map<string, int> KEYWORDS_MAP = createKeywordsMap();
 
-AtomKeyword::AtomKeyword(int k) {
+AtomKeyword::AtomKeyword(AtomPos p, int k):Atom(p) {
     key = k;
 }
 
@@ -32,8 +32,8 @@ int AtomKeyword::getGrammarSymbolID()const {
     return key;
 }
 
-AtomSymbol::AtomSymbol(const string& s, int i):
-        str(s), id(i) {
+AtomSymbol::AtomSymbol(AtomPos p, const string& s, int i)
+        :Atom(p), str(s), id(i) {
 }
 
 string AtomSymbol::getStr()const {
@@ -48,7 +48,7 @@ int AtomSymbol::getGrammarSymbolID()const {
     return -1;
 }
 
-AtomConstant::AtomConstant(const string& s, Type t) {
+AtomConstant::AtomConstant(AtomPos p, const string& s, Type t):Atom(p) {
     str = s;
     type = t;
 }

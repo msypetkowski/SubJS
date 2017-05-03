@@ -91,21 +91,22 @@ const array<char, 21> SPECIAL_CHARACTERS = {{
     '%',         // [54]
 }};
 
+typedef std::pair<unsigned, unsigned> AtomPos;
 
 struct Atom {
+    AtomPos pos;
     virtual string getStr()const=0;
     virtual string getRepr()const=0;
     virtual int getGrammarSymbolID()const=0;
-    std::pair<unsigned, unsigned> getPos()const {
-        // TODO: implement
-        return {1234,5678};
-    }
+
+    Atom(const AtomPos& p): pos(p) { }
+    AtomPos getPos()const { return pos; }
 };
 
 struct AtomKeyword : public Atom {
     int key;
 
-    AtomKeyword(int key);
+    AtomKeyword(AtomPos p, int key);
     virtual string getStr()const;
     virtual string getRepr()const;
     virtual int getGrammarSymbolID()const;
@@ -115,7 +116,7 @@ struct AtomSymbol : public Atom {
     string str;
     int id;
 
-    AtomSymbol(const string&, int);
+    AtomSymbol(AtomPos p, const string&, int);
     virtual string getStr()const;
     virtual string getRepr()const;
     virtual int getGrammarSymbolID()const;
@@ -130,7 +131,7 @@ struct AtomConstant : public Atom {
     string str;
     Type type;
 
-    AtomConstant(const string&, Type);
+    AtomConstant(AtomPos p, const string&, Type);
     virtual string getStr()const;
     virtual string getRepr()const;
     virtual int getGrammarSymbolID()const;

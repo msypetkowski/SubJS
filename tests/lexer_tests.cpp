@@ -402,6 +402,32 @@ for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticlerad
         BOOST_CHECK_THROW(l2.getNextAtom(), string);
     }
 
+    BOOST_AUTO_TEST_CASE(testComments5) {
+        string code1 = R"foo(
+var a,b,c;
+// if
+var h // qwe
+        )foo";
+        Lexer l1(code1);
+        BOOST_CHECK(l1.run());
+        auto atoms1 = l1.getAtoms();
+
+        string code2 = R"foo(
+var a,b,c;
+var h
+        )foo";
+        Lexer l2(code2);
+        BOOST_CHECK(l2.run());
+        auto atoms2 = l2.getAtoms();
+
+        for (auto tup : boost::combine(atoms1, atoms2)) {
+            Atom* a1;
+            Atom* a2;
+            boost::tie(a1,a2) = tup;
+            BOOST_CHECK_EQUAL(a1->getStr(), a2->getStr());
+        }
+    }
+
     BOOST_AUTO_TEST_CASE(testGetAtom2) {
         string code = "var a=1";
         Lexer l(code);

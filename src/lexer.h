@@ -25,10 +25,32 @@ class Lexer {
 
     bool isWhitespace(char);
     bool isSpecial(char);
+
     bool getKeyword();
     bool getSymbol();
     bool getConstant();
     bool getComment();
+
+    void newKeywordAtom(int key) {
+        AtomPos p {line[pos], pos - lastEndl[pos] - 1};
+        atoms.push_back(new AtomKeyword(p, key));
+    }
+    void newSymbolAtom(const string& word) {
+        AtomPos p {line[pos], pos - lastEndl[pos] - 1};
+        atoms.push_back(new AtomSymbol(p, word, symbolsMap[word]));
+    }
+    void newConstantStringAtom(const string& word) {
+        AtomPos p {line[pos], pos - lastEndl[pos] - 1};
+        atoms.push_back(new AtomConstant(p, word, AtomConstant::Type::String));
+    }
+    void newConstantIntegerAtom(const string& word) {
+        AtomPos p {line[pos], pos - lastEndl[pos] - 1};
+        atoms.push_back(new AtomConstant(p, word, AtomConstant::Type::Integer));
+    }
+    void newConstantFloatAtom(const string& word) {
+        AtomPos p {line[pos], pos - lastEndl[pos] - 1};
+        atoms.push_back(new AtomConstant(p, word, AtomConstant::Type::Float));
+    }
 
 public:
     Lexer(const string&);

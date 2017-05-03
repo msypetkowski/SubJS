@@ -48,7 +48,7 @@ bool Lexer::getKeyword() {
         }
         auto keyIter = std::find(KEYWORDS_STRINGS.begin(), KEYWORDS_STRINGS.end(), word);
         if (keyIter != KEYWORDS_STRINGS.end()) {
-            atoms.push_back(new AtomKeyword(std::distance(KEYWORDS_STRINGS.begin(), keyIter)));
+            newKeywordAtom(std::distance(KEYWORDS_STRINGS.begin(), keyIter));
             pos = wordEnd;
             return true;
         } else return false;
@@ -75,7 +75,7 @@ bool Lexer::getKeyword() {
             break;
     }
     if (bestMatch != -1) {
-        atoms.push_back(new AtomKeyword(bestMatch));
+        newKeywordAtom(bestMatch);
         pos += KEYWORDS_STRINGS[bestMatch].size();
         return true;
     }
@@ -85,18 +85,20 @@ bool Lexer::getKeyword() {
 bool Lexer::getSymbol() {
     while (isWhitespace(code[pos]))
         ++pos;
+    auto newPos = pos;
     string word;
-    if (isLetter(code[pos])){
-        while(isLetter(code[pos]) || isNumber(code[pos])){
-            word += code[pos];
-            ++pos;
+    if (isLetter(code[newPos])){
+        while(isLetter(code[newPos]) || isNumber(code[newPos])){
+            word += code[newPos];
+            ++newPos;
         }
     }
     if (word != "") {
         if (symbolsMap.find(word) == symbolsMap.end()) {
             symbolsMap[word] = nextNewSymbolId++;
         }
-        atoms.push_back(new AtomSymbol(word, symbolsMap[word]));
+        newSymbolAtom(word);
+        pos = newPos;
         return true;
     }
     return false;
@@ -125,7 +127,7 @@ bool Lexer::getConstant() {
         if (code[newPos] == '$') {
             return false;
         } else {
-            atoms.push_back(new AtomConstant(word, AtomConstant::Type::String));
+            newConstantStringAtom(word);
             pos = newPos + 1;
             return true;
         }
@@ -140,7 +142,7 @@ bool Lexer::getConstant() {
         }
         if (word == ".")
             return false;
-        atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
+        newConstantFloatAtom(word);
         pos = newPos;
         return true;
     }
@@ -161,13 +163,12 @@ bool Lexer::getConstant() {
             }
             if (*word.rbegin() == '.') {
                 if (!isLetter(code[newPos])) {
-                    atoms.push_back(new AtomConstant(word.substr(0, word.size()-1),
-                                AtomConstant::Type::Integer));
+                    newConstantIntegerAtom(word.substr(0, word.size()-1));
                 } else {
                     return false;
                 }
             } else {
-                atoms.push_back(new AtomConstant(word, AtomConstant::Type::Float));
+                newConstantFloatAtom(word);
             }
         } else if(code[newPos] == 'x' && word == "0") {
             word += code[newPos];
@@ -181,12 +182,11 @@ bool Lexer::getConstant() {
                 return false;
             } else {
                 if (!isLetter(code[newPos])) {
-                atoms.push_back(new AtomConstant(word,
-                            AtomConstant::Type::Integer));
+                newConstantIntegerAtom(word);
                 } else return false;
             }
         } else if (!isLetter(code[newPos])) {
-            atoms.push_back(new AtomConstant(word, AtomConstant::Type::Integer));
+            newConstantIntegerAtom(word);
         } else return false;
         pos = newPos;
         return true;
@@ -247,19 +247,9 @@ Lexer::Lexer(const string& code1):
 }
 
 bool Lexer::run(){
-    while (pos < code.size()) {
-        if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
-            if (code[pos] == '$')
-                break;
-
-            errors.push_back({line[pos], pos - lastEndl[pos] - 1});
-            while(!isWhitespace(code[pos]))
-                ++pos;
-        }
-    }
-
-    // end of file
-    atoms.push_back(new AtomKeyword(6));
+    Atom* newAtom = getNextAtom();
+    while (newAtom == nullptr || newAtom->getRepr() != "$")
+        newAtom = getNextAtom();
     if (errors.empty())
         return true;
     else return false;
@@ -278,13 +268,14 @@ Atom* Lexer::getNextAtom() {
         throw string("Trying to get atom after end of file.");
     }
     if (pos >= code.size()) {
-        atoms.push_back(new AtomKeyword(6));
+        newKeywordAtom(6);
         return *atoms.rbegin();
     }
 
-    if (!getComment() && !getConstant() && !getKeyword() && !getSymbol()) {
+    while(getComment());
+    if (!getConstant() && !getKeyword() && !getSymbol()) {
         if (code[pos] == '$'){
-            atoms.push_back(new AtomKeyword(6));
+            newKeywordAtom(6);
             return *atoms.rbegin();
         }
 
