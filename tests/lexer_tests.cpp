@@ -9,13 +9,14 @@
 // #define private public
 // #define protected public
 
+#include "../src/source.h"
 #include "../src/lexer.h"
 #include "../src/atom.h"
 
 namespace LexerTests
 {
     BOOST_AUTO_TEST_CASE(testKeywords1) {
-        string code = "(){}[]=";
+        Source code = Source::fromString("(){}[]=");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -31,7 +32,7 @@ namespace LexerTests
     }
 
     BOOST_AUTO_TEST_CASE(testKeywords2) {
-        string code = "";
+        Source code = Source::fromString("");
         for (auto k : KEYWORDS_STRINGS) {
             if (k == "$") {
                 code += "endOfFile ";
@@ -55,7 +56,7 @@ namespace LexerTests
     }
 
     BOOST_AUTO_TEST_CASE(testIgnoreWhitespace) {
-        string code = "(\n)\n \t {}\n[  \t]";
+        Source code = Source::fromString("(\n)\n \t {}\n[  \t]");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -64,7 +65,7 @@ namespace LexerTests
     }
 
     BOOST_AUTO_TEST_CASE(testStringConstant1) {
-        string code = "var a = 'text'";
+        Source code = Source::fromString("var a = 'text'");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -77,7 +78,7 @@ namespace LexerTests
     }
 
     BOOST_AUTO_TEST_CASE(testStringConstant2) {
-        string code = "var a = 'text \\n \"text\"'";
+        Source code = Source::fromString("var a = 'text \\n \"text\"'");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -90,9 +91,9 @@ namespace LexerTests
     }
 
     BOOST_AUTO_TEST_CASE(testStringConstant3) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 var a='"some" \n "reversed" var a="string"'["split"]('')["reverse"]()["join"]('');
-        )foo";
+        )foo");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -104,9 +105,9 @@ var a='"some" \n "reversed" var a="string"'["split"]('')["reverse"]()["join"](''
     }
 
     BOOST_AUTO_TEST_CASE(testStringConstant4) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 a='foo\'' b="\"foo\\" c='foo\\\''
-        )foo";
+        )foo");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -118,9 +119,9 @@ a='foo\'' b="\"foo\\" c='foo\\\''
     }
 
     BOOST_AUTO_TEST_CASE(testStringConstant5) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 a='foo\'' b="\"foo\\" c='notClosed\'
-        )foo";
+        )foo");
         Lexer l(code);
 
         BOOST_CHECK(!l.run());
@@ -128,7 +129,7 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testNumberConstant) {
-        string code = "var a = 123 ; var b = 1.003";
+        Source code = Source::fromString("var a = 123 ; var b = 1.003");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -145,17 +146,17 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testNumberConstant2) {
-        string code1 = "0x123 1x1";
+        Source code1 = Source::fromString("0x123 1x1");
         Lexer l1(code1);
         BOOST_CHECK(!l1.run());
 
-        string code2 = "0x123 . 1";
+        Source code2 = Source::fromString("0x123 . 1");
         Lexer l2(code2);
         BOOST_CHECK(l2.run());
     }
 
     BOOST_AUTO_TEST_CASE(testFloatConstant) {
-        string code = "1.02 .5 12.";
+        Source code = Source::fromString("1.02 .5 12.");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -178,7 +179,7 @@ a='foo\'' b="\"foo\\" c='notClosed\'
         BOOST_CHECK_EQUAL(atoms[2]->getRepr(), "12");
     }
     BOOST_AUTO_TEST_CASE(testSymbolAtom) {
-        string code = "_1 abc fda1__4";
+        Source code = Source::fromString("_1 abc fda1__4");
         Lexer l(code);
         BOOST_CHECK(l.run());
         auto atoms = l.getAtoms();
@@ -190,7 +191,7 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral1) {
-        string code = "for(var a=1;;)++";
+        Source code = Source::fromString("for(var a=1;;)++");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -203,7 +204,7 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral2) {
-        string code = " var uradtodeg = \"\\x74h\";\n var um = \"l\\x65ng\";\n var ucollisionend = \"n\\x67th\";\n";
+        Source code = Source::fromString(" var uradtodeg = \"\\x74h\";\n var um = \"l\\x65ng\";\n var ucollisionend = \"n\\x67th\";\n");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -221,7 +222,7 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral3) {
-        string code = "acollisionend[(function mmi(){return mothumbnailslist;}()) + mhtc + mrenderer](bmsg, 8740 - 8738);";
+        Source code = Source::fromString("acollisionend[(function mmi(){return mothumbnailslist;}()) + mhtc + mrenderer](bmsg, 8740 - 8738);");
         Lexer l(code);
 
         BOOST_CHECK(l.run());
@@ -237,12 +238,12 @@ a='foo\'' b="\"foo\\" c='notClosed\'
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral4) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 function radtodeg(arenderer)
 {
 	if (arenderer[0] == 0x4D && arenderer[1] == 0x5a)
 		{return true;}
-)foo";
+)foo");
 
         Lexer l(code);
 
@@ -263,7 +264,7 @@ function radtodeg(arenderer)
     }
 
     BOOST_AUTO_TEST_CASE(testGeneral5) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 var ami = new Array();
 for (var mi = 0; mi < htc[jmsg(idoxie) + jcollisionend(imsg) + iparticleradius]; mi++)
 {
@@ -274,7 +275,7 @@ for (var mi = 0; mi < htc[jmsg(idoxie) + jcollisionend(imsg) + iparticleradius];
         {var atends = am[renderer];}
     ami.push(atends);
 };
-)foo";
+)foo");
         std::array<string, 80> expectedAtoms = {{
             "var", "ami", "=", "new", "Array", "(", ")",
             ";", "for", "(", "var", "mi", "=", "0",
@@ -303,7 +304,7 @@ for (var mi = 0; mi < htc[jmsg(idoxie) + jcollisionend(imsg) + iparticleradius];
     }
 
     BOOST_AUTO_TEST_CASE(testFail1) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 var ami = new Array();
 for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradius]; mi++)
 {
@@ -314,7 +315,7 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
         {var atends = am[renderer];}
     ami.push(atends);
 };
-)foo";
+)foo");
         Lexer l(code);
         BOOST_CHECK(!l.run());
         auto errors = l.getErrors();
@@ -330,7 +331,7 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
     }
 
     BOOST_AUTO_TEST_CASE(testComments1) {
-        string code = "a = 1 // this \r \t  is comment ***";
+        Source code = Source::fromString("a = 1 // this \r \t  is comment ***");
         Lexer l(code);
         BOOST_CHECK(l.run());
         auto atoms = l.getAtoms();
@@ -338,7 +339,7 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
     }
 
     BOOST_AUTO_TEST_CASE(testComments2) {
-        string code = "a = 1 /* /* this is comment ***/  a*4";
+        Source code = Source::fromString("a = 1 /* /* this is comment ***/  a*4");
         Lexer l(code);
         BOOST_CHECK(l.run());
         auto atoms = l.getAtoms();
@@ -346,7 +347,7 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
     }
 
     BOOST_AUTO_TEST_CASE(testComments3) {
-        string code = "a = 1 /* *** this is not closed \n \t comment";
+        Source code = Source::fromString("a = 1 /* *** this is not closed \n \t comment");
         Lexer l(code);
         BOOST_CHECK(!l.run());
         auto errors = l.getErrors();
@@ -356,11 +357,11 @@ for (var mi = 1x; mi < htc[jmsg(idoxie) + jcollisionend(2.imsg) + iparticleradiu
     }
 
     BOOST_AUTO_TEST_CASE(testComments4) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 a/* *** this comment ****/ b // "this is comment too"
 c // comment      d e f // * */ /*
 d
-        )foo";
+        )foo");
         Lexer l(code);
         BOOST_CHECK(l.run());
         auto atoms = l.getAtoms();
@@ -373,7 +374,7 @@ d
     }
 
     BOOST_AUTO_TEST_CASE(testGetAtom1) {
-        string code = R"foo(
+        Source code = Source::fromString(R"foo(
 for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticleradius]; mi++)
 {
     atends = arenderer[mi];
@@ -383,7 +384,7 @@ for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticlerad
         {renderer = othumbnailslist[atends];}
     aflexwhitespace.push(String.fromCharCode(renderer));
 }
-)foo";
+)foo");
 
         Lexer l(code);
         BOOST_CHECK(l.run());
@@ -403,19 +404,19 @@ for (var mi = -824 + 824; mi < arenderer[jradtodeg(idoxie) + imsg + iparticlerad
     }
 
     BOOST_AUTO_TEST_CASE(testComments5) {
-        string code1 = R"foo(
+        Source code1 = Source::fromString(R"foo(
 var a,b,c;
 // if
 var h // qwe
-        )foo";
+        )foo");
         Lexer l1(code1);
         BOOST_CHECK(l1.run());
         auto atoms1 = l1.getAtoms();
 
-        string code2 = R"foo(
+        Source code2 = Source::fromString(R"foo(
 var a,b,c;
 var h
-        )foo";
+        )foo");
         Lexer l2(code2);
         BOOST_CHECK(l2.run());
         auto atoms2 = l2.getAtoms();
@@ -429,7 +430,7 @@ var h
     }
 
     BOOST_AUTO_TEST_CASE(testGetAtom2) {
-        string code = "var a=1";
+        Source code = Source::fromString("var a=1");
         Lexer l(code);
 
         BOOST_CHECK_EQUAL(l.getNextAtom()->getRepr(), "var");
@@ -442,7 +443,7 @@ var h
     }
 
     BOOST_AUTO_TEST_CASE(testGetLastError) {
-        string code = "a = 1a 4 1.g";
+        Source code = Source::fromString("a = 1a 4 1.g");
         Lexer l(code);
 
         // a

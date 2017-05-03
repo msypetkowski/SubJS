@@ -1,8 +1,8 @@
+#include "source.h"
 #include "lexer.h"
 #include "parser.h"
 
 #include <iostream>
-#include <fstream>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/combine.hpp>
@@ -46,26 +46,23 @@ int main(int argc, char **argv) {
     conflicting_options(vm, "lexical-only", "parse-only");
     conflicting_options(vm, "input-file", "command");
 
-    string code="";
+    Source source;
     if (vm.count("command")) {
-        code = vm["command"].as<string>();
+        source = Source::fromString(vm["command"].as<string>());
     } else if (vm.count("input-file")) {
         string fileName = vm["input-file"].as<string>();
         if (!boost::filesystem::exists(fileName)) {
             std::cout << "File \"" << fileName << "\" does not exist." << endl;
             return 1;
         }
-        std::ifstream t(fileName);
-        std::stringstream buffer;
-        buffer << t.rdbuf();
-        code = buffer.str();
+        source = Source(fileName);
     } else {
         std::cout << "Interactive mode not implemented." <<endl;
         return 1;
     }
 
     if (vm.count("lexical-only")) {
-        Lexer l(code);
+        Lexer l(source);
         if (l.run()){
             cout << "Analysis finished. Atoms list:" << endl;
             for (Atom* a : l.getAtoms()) {
@@ -83,7 +80,7 @@ int main(int argc, char **argv) {
             // }
         }
     } else if (vm.count("parse-only")) {
-        Lexer l(code);
+        Lexer l(source);
         Parser p(l);
         p.Program();
         if (p.getErrorsMessages().empty()) {

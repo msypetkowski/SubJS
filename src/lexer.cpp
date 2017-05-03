@@ -223,7 +223,7 @@ bool Lexer::getComment(){
     return false;
 }
 
-Lexer::Lexer(const string& code1):
+Lexer::Lexer(Source& code1):
         code(code1),
         nextNewSymbolId(0),
         pos(0),

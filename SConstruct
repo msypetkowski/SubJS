@@ -23,6 +23,7 @@ env_test.Append(CCFLAGS='--define BOOST_TEST_DYN_LINK')
 test_sources = []
 test_sources.append(Glob('_build_test/*.cpp'))
 # TODO: get all .o from src without main.o
+test_sources.append(Glob('_build/source.o'))
 test_sources.append(Glob('_build/lexer.o'))
 test_sources.append(Glob('_build/atom.o'))
 test_sources.append(Glob('_build/parser.o'))

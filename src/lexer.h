@@ -1,4 +1,5 @@
 #pragma once
+#include "source.h"
 #include "atom.h"
 
 #include <string>
@@ -12,7 +13,7 @@ using std::map;
 class Lexer {
     vector<Atom*> atoms;
     vector<std::pair<unsigned,unsigned>> errors;
-    string code;
+    Source code;
     unsigned nextNewSymbolId;
     map<string, int> symbolsMap;
 
@@ -53,7 +54,7 @@ class Lexer {
     }
 
 public:
-    Lexer(const string&);
+    Lexer(Source&);
 
     Atom* getNextAtom();
     std::pair<unsigned,unsigned> getLastError();
