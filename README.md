@@ -104,6 +104,11 @@ Lexical units
 | 53  | '>=' |
 | 54  | '%' |
 | 55  | '%=' |
+| 56  | '?' |
+| 57  | ':' |
+| 58  | '<<' |
+| 59  | '>>' |
+| 60  | '>>>' |
 
 Syntax
 ------
@@ -118,7 +123,6 @@ Program
 Block
     = Declaration
     | OneLineCommaOperator OneLineCommaOperatorSeparator
-    | Separator
 
     | Symbol ExpressionRest
     | Array ExpressionRest
@@ -148,7 +152,7 @@ DeclarationType
 Declaration
     = DeclarationType DeclarationElem { ',' DeclarationElem }
 DeclarationElem
-    = ident '=' Expression
+    = ident '=' AssignmentExpression
     | ident
 ```
 
@@ -169,77 +173,137 @@ OneLineCommaOperatorNext
 #### Expression
 
 ```C
-Symbol
-    = ident
-    | constant
 Expression
-    = Symbol ExpressionRest
-    | Array ExpressionRest
-    | CommaOperator ExpressionRest
-    | new Expression
-    | FunctionExpression ExpressionRest
-ExpressionRest
-    = Get
-    | Get2
-    | Call
-    | ArithmeticOp
-    | AssignmentOp
-    | CmpOp
-    | '++'
-    | '--'
-    | '&&' Expression
-    | '|| Expression
-    | epsilon
+    = AssignmentExpression
+    | AssignmentExpression "," Expression
 
-// Expression beginnings (Array or CommaOperator in brackets)
-Array
-    = '[' ArrayElem
-ArrayElem
-    = Expression ',' ArrayElem
-    | Expression ']'
-    | ',' ArrayElem
-    | ']'
-CommaOperator
-    = '(' CommaOperatorNext
-CommaOperatorNext
-    = Expression ',' CommaOperatorNext
-    | Expression ')'
+AssignmentExpression
+    = ConditionalExpression
+    | ConditionalExpression AssignmentOperator AssignmentExpression
 
-// particular Expression rests
-Get
-    = '[' Expression ']'
-Get2
-    = '.' ident
-Call
-    = '(' CallNextArg
-    | '(' ')'
-CallNextArg
-    = Expression ')'
-    | Expression ',' CallNextArg
-ArithmeticOp
-    = '+' Expression
-    | '-' Expression
-    | '*' Expression
-    | '/' Expression
-    | '^' Expression
-    | '&' Expression
-    | '|' Expression
-    | '%' Expression
-AssignmentOp
-    = '=' Expression
-    | '+=' Expression
-    | '-=' Expression
-    | '*=' Expression
-    | '/=' Expression
-    | '^=' Expression
-    | '&=' Expression
-    | '|=' Expression
-    | '%=' Expression
-CmpOp
+ConditionalExpression
+    = OrExpression
+    | OrExpression "?" AssignmentExpression ":" AssignmentExpression
+
+OrExpression
+    = AndExpression
+    | AndExpression "||" OrExpression
+
+AndExpression
+    = BitwiseOrExpression
+    | BitwiseOrExpression "&&" AndExpression
+
+BitwiseOrExpression
+    = BitwiseXorExpression
+    | BitwiseXorExpression "|" BitwiseOrExpression
+
+BitwiseXorExpression
+    = BitwiseAndExpression
+    | BitwiseAndExpression "^" BitwiseXorExpression
+
+BitwiseAndExpression
+    = EqualityExpression
+    | EqualityExpression "&" BitwiseAndExpression
+
+EqualityExpression
+    = RelationalExpression
+    | RelationalExpression EqualityOperator EqualityExpression
+
+RelationalExpression
+    = ShiftExpression
+    | RelationalExpression RelationalOperator ShiftExpression
+
+ShiftExpression
+    = AdditiveExpression
+    | AdditiveExpression ShiftOperator ShiftExpression
+
+AdditiveExpression
+    = MultiplicativeExpression
+    | MultiplicativeExpression AdditiveOperator AdditiveExpression
+
+MultiplicativeExpression
+    = UnaryExpression
+    | UnaryExpression MultiplicativeOperator MultiplicativeExpression
+
+UnaryExpression
+    = MemberExpression
+    | UnaryOperator UnaryExpression
+    | '-' UnaryExpression
+    | IncrementOperator MemberExpression // TODO
+    | MemberExpression IncrementOperator
+    | new Constructor // TODO
+    | delete MemberExpression
+
+// TODO
+Constructor
+    = this . ConstructorCall
+    | ConstructorCall
+
+ConstructorCall
+    = ident
+    | ident ( ArgumentListOpt )
+    | ident . ConstructorCall
+
+MemberExpression
+    = PrimaryExpression
+    | PrimaryExpression '.' MemberExpression
+    | PrimaryExpression '[' Expression ']'
+    | PrimaryExpression '(' ArgumentListOpt ')'
+
+ArgumentListOpt
+    = epsilon
+    | ArgumentList
+
+ArgumentList
+    = AssignmentExpression
+    | AssignmentExpression ',' ArgumentList
+
+PrimaryExpression
+    = '(' Expression ')'
+    | ident
+    | constant
+    | false
+    | true
+    | null
+    | this
+
+AssignmentOperator
+    = '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '^='
+    | '&='
+    | '|='
+    | '%='
+
+EqualityOperator
+    = '==' Expression
+    | '!=' Expression
+
+RelationalOperator
     = '<' Expression
     | '<=' Expression
     | '>' Expression
     | '>=' Expression
+
+ShiftOperator
+    = '<<'
+    | '>>'
+    | '>>>'
+
+AdditiveOperator
+    = '+'
+    | '-'
+
+MultiplicativeOperator
+    = '*'
+    | '/'
+
+UnaryOperator
+    = '--'
+    = '++'
 ```
 
 ### FunctionExpression

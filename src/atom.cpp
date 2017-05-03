@@ -79,6 +79,16 @@ SymSet::SymSet(std::initializer_list<const string> l) {
     }
 }
 
+// SymSet::SymSet(std::vector<const string> l) {
+//     for (string s : l) {
+//         if (s=="SYMBOL")
+//             includeSymbol();
+//         else if (s=="CONSTANT")
+//             includeConstant();
+//         else data.insert(KEYWORDS_MAP[s]);
+//     }
+// }
+
 bool SymSet::hasKeyword(const string&s )const {
     return data.count(KEYWORDS_MAP[s]);
 }

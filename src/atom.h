@@ -3,10 +3,11 @@
 #include<string>
 #include<set>
 #include<map>
+#include<vector>
 using std::array;
 using std::string;
 
-const array<string, 56> KEYWORDS_STRINGS = {{
+const array<string, 61> KEYWORDS_STRINGS = {{
     "++",        // [0]
     "--",        // [1]
     ".",         // [2]
@@ -63,11 +64,16 @@ const array<string, 56> KEYWORDS_STRINGS = {{
     ">=",        // [53]
     "%",         // [54]
     "%=",        // [55]
+    "?",         // [56]
+    ":",         // [57]
+    "<<",        // [58]
+    ">>",        // [59]
+    ">>>",       // [60]
 }};
 
 // extern const std::map<string, int> KEYWORDS_MAP;
 
-const array<char, 21> SPECIAL_CHARACTERS = {{
+const array<char, 23> SPECIAL_CHARACTERS = {{
     '.',         // [2]
     ',',         // [3]
     ';',         // [4]
@@ -89,6 +95,8 @@ const array<char, 21> SPECIAL_CHARACTERS = {{
     '<',         // [50]
     '>',         // [52]
     '%',         // [54]
+    '?',         // [56]
+    ':',         // [57]
 }};
 
 typedef std::pair<unsigned, unsigned> AtomPos;
@@ -105,7 +113,6 @@ struct Atom {
 
 struct AtomKeyword : public Atom {
     int key;
-
     AtomKeyword(AtomPos p, int key);
     virtual string getStr()const;
     virtual string getRepr()const;
@@ -141,6 +148,7 @@ class SymSet {
     std::set<int> data;
 public:
     SymSet(std::initializer_list<const string>);
+    //SymSet(std::vector<const string>);
     void includeSymbol() { data.insert(-1); }
     void includeConstant() { data.insert(-1); }
 

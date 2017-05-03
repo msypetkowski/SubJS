@@ -3,6 +3,15 @@
 #include <iostream>
 #include <cassert>
 
+// const std::vector<string> ASSIGNMENT_OPERATORS={{
+//     "=", "+=", "-=", "*=", "/=", "^=", "&=", "|=", "%=",
+// }};
+#define ASSIGNMENT_OPERATORS { \
+    "=", "+=", "-=", "*=", "/=", "^=", "&=", "|=", "%=", \
+}
+#define ADDITIVE_OPERATORS { "+", "-" }
+#define MULTIPLICATIVE_OPERATORS { "*", "/" }
+
 Parser::Parser(Lexer& l):lexer(l), canParse(true) {
     nextAtom();
 }
@@ -74,7 +83,6 @@ void Parser::Program() {
 Block
     = Declaration
     | OneLineCommaOperator OneLineCommaOperatorSeparator
-    | Separator
 
     | Symbol ExpressionRest
     | Array ExpressionRest
@@ -118,7 +126,7 @@ DeclarationType
     | let
     | const
 DeclarationElem
-    = ident '=' Expression
+    = ident '=' AssignmentExpression
     | ident
 */
 void Parser::Declaration(const SymSet& follow) {
@@ -147,13 +155,303 @@ void Parser::DeclarationType(const SymSet&) {
     }
     tb.treeNodeEnd();
 }
-void Parser::DeclarationElem(const SymSet&) {
+void Parser::DeclarationElem(const SymSet& follow) {
     tb.treeNodeStart("DeclarationElem");
     acceptSymbol();
     if (isCurAtomKeyword("=")) {
-        // TODO: Expression here
         acceptKeyword("=");
-        acceptConstant();
+        AssignmentExpression(follow);
     }
     tb.treeNodeEnd();
+}
+
+
+/*
+Expression
+    = AssignmentExpression
+    | AssignmentExpression "," Expression
+
+AssignmentExpression
+    = ConditionalExpression
+    | ConditionalExpression AssignmentOperator AssignmentExpression
+
+ConditionalExpression
+    = OrExpression
+    | OrExpression "?" AssignmentExpression ":" AssignmentExpression
+
+OrExpression
+    = AndExpression
+    | AndExpression "||" OrExpression
+
+AndExpression
+    = BitwiseOrExpression
+    | BitwiseOrExpression "&&" AndExpression
+
+BitwiseOrExpression
+    = BitwiseXorExpression
+    | BitwiseXorExpression "|" BitwiseOrExpression
+
+BitwiseXorExpression
+    = BitwiseAndExpression
+    | BitwiseAndExpression "^" BitwiseXorExpression
+
+BitwiseAndExpression
+    = EqualityExpression
+    | EqualityExpression "&" BitwiseAndExpression
+
+EqualityExpression
+    = RelationalExpression
+    | RelationalExpression EqualityOperator EqualityExpression
+
+RelationalExpression
+    = ShiftExpression
+    | RelationalExpression RelationalOperator ShiftExpression
+
+ShiftExpression
+    = AdditiveExpression
+    | AdditiveExpression ShiftOperator ShiftExpression
+
+AdditiveExpression
+    = MultiplicativeExpression
+    | MultiplicativeExpression AdditiveOperator AdditiveExpression
+
+MultiplicativeExpression
+    = UnaryExpression
+    | UnaryExpression MultiplicativeOperator MultiplicativeExpression
+
+*/
+
+void Parser::Expression                 (const SymSet& follow) {
+    tb.treeNodeStart("Expression");
+    AssignmentExpression(follow + SymSet{","});
+    if (isCurAtomKeyword(",")) {
+        Expression(follow);
+    }
+    tb.treeNodeEnd();
+}
+void Parser::AssignmentExpression       (const SymSet& follow) {
+    tb.treeNodeStart("AssignmentExpression");
+    // TODO: ConditionalExpression here
+    AdditiveExpression(follow + SymSet(ASSIGNMENT_OPERATORS));
+    if (SymSet(ASSIGNMENT_OPERATORS).has(curAtom)) {
+        AssignmentOperator({});
+        AssignmentExpression(follow);
+    }
+    tb.treeNodeEnd();
+}
+void Parser::ConditionalExpression      (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::OrExpression               (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::AndExpression              (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::BitwiseOrExpression        (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::BitwiseXorExpression       (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::BitwiseAndExpression       (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::EqualityExpression         (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::RelationalExpression       (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::ShiftExpression            (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::AdditiveExpression         (const SymSet& follow) {
+    tb.treeNodeStart("AdditiveExpression");
+    MultiplicativeExpression(follow + SymSet(ADDITIVE_OPERATORS));
+    if (SymSet(ADDITIVE_OPERATORS).has(curAtom)) {
+        AdditiveOperator({});
+        AdditiveExpression(follow);
+    }
+    tb.treeNodeEnd();
+}
+void Parser::MultiplicativeExpression   (const SymSet& follow) {
+    tb.treeNodeStart("MultiplicativeExpression");
+    UnaryExpression(follow + SymSet(MULTIPLICATIVE_OPERATORS));
+    if (SymSet(MULTIPLICATIVE_OPERATORS).has(curAtom)) {
+        MultiplicativeOperator({});
+        UnaryExpression(follow);
+    }
+    tb.treeNodeEnd();
+}
+
+/*
+UnaryExpression
+    = MemberExpression
+    | UnaryOperator UnaryExpression
+    | '-' UnaryExpression
+    | IncrementOperator MemberExpression // TODO
+    | MemberExpression IncrementOperator
+    | new Constructor // TODO
+    | delete MemberExpression
+
+// TODO
+Constructor
+    = this . ConstructorCall
+    | ConstructorCall
+
+ConstructorCall
+    = ident
+    | ident ( ArgumentListOpt )
+    | ident . ConstructorCall
+
+MemberExpression
+    = PrimaryExpression
+    | PrimaryExpression '.' MemberExpression
+    | PrimaryExpression '[' Expression ']'
+    | PrimaryExpression '(' ArgumentListOpt ')'
+
+ArgumentListOpt
+    = epsilon
+    | ArgumentList
+
+ArgumentList
+    = AssignmentExpression
+    | AssignmentExpression ',' ArgumentList
+
+PrimaryExpression
+    = '(' Expression ')'
+    | ident
+    | constant
+    | false
+    | true
+    | null
+    | this
+
+AssignmentOperator
+    = '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '^='
+    | '&='
+    | '|='
+    | '%='
+
+EqualityOperator
+    = '==' Expression
+    | '!=' Expression
+
+RelationalOperator
+    = '<' Expression
+    | '<=' Expression
+    | '>' Expression
+    | '>=' Expression
+
+ShiftOperator
+    = '<<'
+    | '>>'
+    | '>>>'
+
+AdditiveOperator
+    = '+'
+    | '-'
+
+MultiplicativeOperator
+    = '*'
+    | '/'
+
+UnaryOperator
+    = '--'
+    = '++'
+ * */
+void Parser::UnaryExpression            (const SymSet& follow) {
+    // TODO: implement properly
+    tb.treeNodeStart("UnaryExpression");
+    acceptConstant();
+    tb.treeNodeEnd();
+}
+void Parser::Constructor                (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::ConstructorCall            (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::MemberExpression           (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::ArgumentListOpt            (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::ArgumentList               (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::PrimaryExpression          (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::AssignmentOperator         (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::EqualityOperator           (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::RelationalOperator         (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::ShiftOperator              (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
+}
+void Parser::AdditiveOperator           (const SymSet& follow) {
+    tb.treeNodeStart("AdditiveOperator");
+    vector<string> ops = ADDITIVE_OPERATORS;
+    for (string o : ops) {
+        if (isCurAtomKeyword(o)) {
+            acceptKeyword(o);
+            tb.treeNodeEnd();
+            return;
+        }
+    }
+    string msg = "Expected AdditiveOperator got: " + curAtom->getStr();
+    errorsPositions.push_back(curAtom->getPos());
+    errorsMessages.push_back(msg);
+    tb.treeNodeEnd();
+}
+void Parser::MultiplicativeOperator     (const SymSet& follow) {
+    tb.treeNodeStart("MultiplicativeOperator");
+    vector<string> ops = MULTIPLICATIVE_OPERATORS;
+    for (string o : ops) {
+        if (isCurAtomKeyword(o)) {
+            acceptKeyword(o);
+            tb.treeNodeEnd();
+            return;
+        }
+    }
+    string msg = "Expected MultiplicativeOperator got: " + curAtom->getStr();
+    errorsPositions.push_back(curAtom->getPos());
+    errorsMessages.push_back(msg);
+    tb.treeNodeEnd();
+}
+void Parser::UnaryOperator              (const SymSet& follow) {
+    // TODO: implement
+    assert(0);
 }

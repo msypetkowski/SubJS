@@ -23,5 +23,5 @@ void TreeBuilder::treeNodeAtom(Atom * a) {
 
 void TreeBuilder::prefix() {
     for(int i=0; i<curTreeDepth; ++i)
-        treeStr += '.';
+        treeStr += "--";
 }
