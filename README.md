@@ -112,28 +112,31 @@ Syntax
 Starting symbol is Program.
 ```C
 Program
-    = Declaration Program
-    | OneLineCommaOperator OneLineCommaOperatorSeparator Program
-    | Separator Program
-
-    | Symbol ExpressionRest Program
-    | Array ExpressionRest Program
-    | CommaOperator ExpressionRest Program
-    | new Expression Program
-    | FunctionExpression Program
-
-    | IfStatement Program
-    | While Program
-    | DoWhile Program
-    | For Program
-    | Try Program
-
-    | continue Separator
-    | break Separator
-    | return Expression Separator
-Separator
-    = ';'
+    = { Block }
     | epsilon
+
+Block
+    = Declaration
+    | OneLineCommaOperator OneLineCommaOperatorSeparator
+    | Separator
+
+    | Symbol ExpressionRest
+    | Array ExpressionRest
+    | CommaOperator ExpressionRest
+    | new Expression
+    | FunctionExpression
+
+    | IfStatement
+    | While
+    | DoWhile
+    | For
+    | Try
+
+    | continue
+    | break
+    | return Expression
+
+    | ';'
 ```
 
 #### Declaration

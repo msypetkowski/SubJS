@@ -28,13 +28,14 @@ namespace ParserTests
 
         string expectedTreeStr=R"(
 Program
-.Declaration
-..DeclarationType
-...Keyword 15 : var
-..DeclarationElem
-...Symbol 0 : a
-...Keyword 35 : =
-...Constant Integer: 123
+.Block
+..Declaration
+...DeclarationType
+....Keyword 15 : var
+...DeclarationElem
+....Symbol 0 : a
+....Keyword 35 : =
+....Constant Integer: 123
         )";
         string producedStr = p.getTreeStr();
 
@@ -53,21 +54,22 @@ Program
 
         string expectedTreeStr=R"(
 Program
-.Declaration
-..DeclarationType
-...Keyword 15 : var
-..DeclarationElem
-...Symbol 0 : qwe
-...Keyword 35 : =
-...Constant Integer: 4
-..Keyword 3 : ,
-..DeclarationElem
-...Symbol 1 : b
-..Keyword 3 : ,
-..DeclarationElem
-...Symbol 2 : c
-...Keyword 35 : =
-...Constant Integer: 1
+.Block
+..Declaration
+...DeclarationType
+....Keyword 15 : var
+...DeclarationElem
+....Symbol 0 : qwe
+....Keyword 35 : =
+....Constant Integer: 4
+...Keyword 3 : ,
+...DeclarationElem
+....Symbol 1 : b
+...Keyword 3 : ,
+...DeclarationElem
+....Symbol 2 : c
+....Keyword 35 : =
+....Constant Integer: 1
         )";
         string producedStr = p.getTreeStr();
 

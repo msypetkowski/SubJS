@@ -12,11 +12,13 @@ class Parser {
     void acceptConstant();
     void acceptSymbol();
 
+    bool isCurAtomKeyword(const string&);
+
     // parsing tree node methods
-    void DeclarationType();
+    void Block();
     void Declaration();
+    void DeclarationType();
     void DeclarationElem();
-    void DeclarationNext();
 
     vector<std::pair<unsigned,unsigned>> errorsPositions;
     vector<string> errorsMessages;

@@ -7,16 +7,6 @@ Parser::Parser(Lexer& l):lexer(l) {
     nextAtom();
 }
 
-// void Parser::treeNodeLogStart(const string&){
-// }
-// void Parser::treeNodeLogEnd(){
-// }
-// void Parser::treeNodeLogAtom(){
-// }
-// string Parser::getTreeStr(){
-//     return "";
-// }
-
 void Parser::nextAtom() {
     while(!(curAtom=lexer.getNextAtom())) {
         errorsPositions.push_back(lexer.getLastError());
@@ -59,59 +49,81 @@ void Parser::acceptSymbol() {
     }
 }
 
-
-/*
-Program
-    = Declaration Program
-    | OneLineCommaOperator OneLineCommaOperatorSeparator Program
-    | Separator Program
-
-    | Symbol ExpressionRest DeclarationSeparator Program
-    | Array ExpressionRest DeclarationSeparator Program
-    | CommaOperator ExpressionRest DeclarationSeparator Program
-    | new Expression DeclarationSeparator Program
-    | FunctionExpression Program
-
-    | IfStatement Program
-    | While Program
-    | DoWhile Program
-    | For Program
-    | Try Program
-
-    | continue Separator
-    | break Separator
-    | return Expression Separator
-Separator
-    = ';'
-    | epsilon
-*/
-
-// TODO: implement whole
-void Parser::Program() {
-    tb.treeNodeStart("Program");
-    if (curAtom->getRepr() == "$") {
-        std::cout<<"end"<<std::endl;
-    } else if (curAtom->getRepr() == ";") {
-        acceptKeyword(";");
-        Program();
-    } else if (curAtom->getRepr() == "var") {
-        Declaration();
-    }
-    tb.treeNodeEnd();
+bool Parser::isCurAtomKeyword(const string& repr) {
+    return dynamic_cast<AtomKeyword*>(curAtom)
+        && curAtom->getRepr()==repr;
 }
 
 
 /*
+Program
+    = { Block }
+    | epsilon
+*/
+void Parser::Program() {
+    tb.treeNodeStart("Program");
+    while (!isCurAtomKeyword("$")) {
+        Block();
+    }
+    tb.treeNodeEnd();
+}
+
+/*
+Block
+    = Declaration
+    | OneLineCommaOperator OneLineCommaOperatorSeparator
+    | Separator
+
+    | Symbol ExpressionRest
+    | Array ExpressionRest
+    | CommaOperator ExpressionRest
+    | new Expression
+    | FunctionExpression
+
+    | IfStatement
+    | While
+    | DoWhile
+    | For
+    | Try
+
+    | continue
+    | break
+    | return Expression
+
+    | ';'
+ */
+// TODO: implement whole
+void Parser::Block() {
+    tb.treeNodeStart("Block");
+    if (isCurAtomKeyword("var")) {
+        Declaration();
+    } else  if (isCurAtomKeyword(";")) {
+        acceptKeyword(";");
+    }
+    tb.treeNodeEnd();
+}
+
+/*
+Declaration
+    = DeclarationType DeclarationElem { ',' DeclarationElem }
 DeclarationType
     = var
     | let
     | const
-Declaration
-    = DeclarationType DeclarationElem { ',' DeclarationElem }
 DeclarationElem
     = ident '=' Expression
     | ident
 */
+void Parser::Declaration() {
+    tb.treeNodeStart("Declaration");
+    DeclarationType();
+    DeclarationElem();
+    while (curAtom->getRepr() == ",") {
+        acceptKeyword(",");
+        DeclarationElem();
+    }
+    tb.treeNodeEnd();
+}
 void Parser::DeclarationType() {
     tb.treeNodeStart("DeclarationType");
     if (curAtom->getRepr() == "var") {
@@ -120,16 +132,6 @@ void Parser::DeclarationType() {
         acceptKeyword("let");
     } else if (curAtom->getRepr() == "const") {
         acceptKeyword("const");
-    }
-    tb.treeNodeEnd();
-}
-void Parser::Declaration() {
-    tb.treeNodeStart("Declaration");
-    DeclarationType();
-    DeclarationElem();
-    while (curAtom->getRepr() == ",") {
-        acceptKeyword(",");
-        DeclarationElem();
     }
     tb.treeNodeEnd();
 }
