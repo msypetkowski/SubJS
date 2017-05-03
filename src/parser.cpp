@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-Parser::Parser(Lexer& l):lexer(l) {
+Parser::Parser(Lexer& l):lexer(l), canParse(true) {
     nextAtom();
 }
 
@@ -11,7 +11,6 @@ void Parser::nextAtom() {
     while(!(curAtom=lexer.getNextAtom())) {
         errorsPositions.push_back(lexer.getLastError());
         errorsMessages.push_back("Lexer error");
-        // TODO: skip atoms
     }
     assert(curAtom!=nullptr);
 }
@@ -22,9 +21,9 @@ void Parser::acceptKeyword(const string& repr) {
         tb.treeNodeAtom(curAtom);
         nextAtom();
     } else {
-        // TODO: error handling
-        std::cout<< "Expected keyword: " << repr << " got: " << curAtom->getRepr() << std::endl;
-        exit(1);
+        string msg = "Expected keyword: " + repr + " got: " + curAtom->getStr();
+        errorsPositions.push_back(curAtom->getPos());
+        errorsMessages.push_back(msg);
     }
 }
 
@@ -33,9 +32,9 @@ void Parser::acceptConstant() {
         tb.treeNodeAtom(curAtom);
         nextAtom();
     } else {
-        // TODO: error handling
-        std::cout<<"Expected Constant"<<std::endl;
-        exit(1);
+        string msg = "Expected Constant, got: " + curAtom->getStr();
+        errorsPositions.push_back(curAtom->getPos());
+        errorsMessages.push_back(msg);
     }
 }
 void Parser::acceptSymbol() {
@@ -43,9 +42,9 @@ void Parser::acceptSymbol() {
         tb.treeNodeAtom(curAtom);
         nextAtom();
     } else {
-        // TODO: error handling
-        std::cout<<"Expected Symbol"<<std::endl;
-        exit(1);
+        string msg = "Expected Symbol, got: " + curAtom->getStr();
+        errorsPositions.push_back(curAtom->getPos());
+        errorsMessages.push_back(msg);
     }
 }
 
@@ -62,9 +61,12 @@ Program
 */
 void Parser::Program() {
     tb.treeNodeStart("Program");
+    SymSet first = {"var", "let", "const", ";", "$"};
+
     while (!isCurAtomKeyword("$")) {
-        Block();
+        Block(first);
     }
+
     tb.treeNodeEnd();
 }
 
@@ -93,13 +95,18 @@ Block
     | ';'
  */
 // TODO: implement whole
-void Parser::Block() {
+void Parser::Block(const SymSet& follow) {
+    SymSet first = {"var", "let", "const", ";"};
+    Synchronize(this, first, follow);
+    if (!canParse) return;
     tb.treeNodeStart("Block");
+
     if (isCurAtomKeyword("var")) {
-        Declaration();
+        Declaration(follow);
     } else  if (isCurAtomKeyword(";")) {
         acceptKeyword(";");
     }
+
     tb.treeNodeEnd();
 }
 
@@ -114,31 +121,36 @@ DeclarationElem
     = ident '=' Expression
     | ident
 */
-void Parser::Declaration() {
+void Parser::Declaration(const SymSet& follow) {
+    SymSet first{"var", "let", "const"};
+    Synchronize(this, first, follow);
+    if (!canParse) return;
     tb.treeNodeStart("Declaration");
-    DeclarationType();
-    DeclarationElem();
-    while (curAtom->getRepr() == ",") {
+
+    DeclarationType({"SYMBOL"});
+    DeclarationElem(follow + SymSet{","});
+    while (isCurAtomKeyword(",")) {
         acceptKeyword(",");
-        DeclarationElem();
+        DeclarationElem(follow + SymSet{","});
     }
+
     tb.treeNodeEnd();
 }
-void Parser::DeclarationType() {
+void Parser::DeclarationType(const SymSet&) {
     tb.treeNodeStart("DeclarationType");
-    if (curAtom->getRepr() == "var") {
+    if (isCurAtomKeyword("var")) {
         acceptKeyword("var");
-    } else if (curAtom->getRepr() == "let") {
+    } else if (isCurAtomKeyword("let")) {
         acceptKeyword("let");
-    } else if (curAtom->getRepr() == "const") {
+    } else if (isCurAtomKeyword("const")) {
         acceptKeyword("const");
     }
     tb.treeNodeEnd();
 }
-void Parser::DeclarationElem() {
+void Parser::DeclarationElem(const SymSet&) {
     tb.treeNodeStart("DeclarationElem");
     acceptSymbol();
-    if (curAtom->getRepr() == "=") {
+    if (isCurAtomKeyword("=")) {
         // TODO: Expression here
         acceptKeyword("=");
         acceptConstant();

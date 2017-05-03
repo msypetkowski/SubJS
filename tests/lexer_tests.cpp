@@ -42,7 +42,7 @@ namespace LexerTests
         BOOST_CHECK(l.run());
         auto atoms = l.getAtoms();
         BOOST_CHECK_EQUAL(atoms.size(), KEYWORDS_STRINGS.size() + 1);
-        for(unsigned i=0; i<KEYWORDS_STRINGS.size(); ++i) {
+        for(int i=0; i<(int)KEYWORDS_STRINGS.size(); ++i) {
             if (KEYWORDS_STRINGS[i] != "$") {
                 BOOST_CHECK_EQUAL(KEYWORDS_STRINGS[i], atoms[i]->getRepr());
 

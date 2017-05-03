@@ -1,6 +1,8 @@
 #pragma once
 #include<array>
 #include<string>
+#include<set>
+#include<map>
 using std::array;
 using std::string;
 
@@ -63,6 +65,8 @@ const array<string, 56> KEYWORDS_STRINGS = {{
     "%=",        // [55]
 }};
 
+// extern const std::map<string, int> KEYWORDS_MAP;
+
 const array<char, 21> SPECIAL_CHARACTERS = {{
     '.',         // [2]
     ',',         // [3]
@@ -91,23 +95,30 @@ const array<char, 21> SPECIAL_CHARACTERS = {{
 struct Atom {
     virtual string getStr()const=0;
     virtual string getRepr()const=0;
+    virtual int getGrammarSymbolID()const=0;
+    std::pair<unsigned, unsigned> getPos()const {
+        // TODO: implement
+        return {1234,5678};
+    }
 };
 
 struct AtomKeyword : public Atom {
-    unsigned key;
+    int key;
 
-    AtomKeyword(unsigned key);
+    AtomKeyword(int key);
     virtual string getStr()const;
     virtual string getRepr()const;
+    virtual int getGrammarSymbolID()const;
 };
 
 struct AtomSymbol : public Atom {
     string str;
-    unsigned id;
+    int id;
 
-    AtomSymbol(const string&, unsigned);
+    AtomSymbol(const string&, int);
     virtual string getStr()const;
     virtual string getRepr()const;
+    virtual int getGrammarSymbolID()const;
 };
 
 struct AtomConstant : public Atom {
@@ -122,4 +133,22 @@ struct AtomConstant : public Atom {
     AtomConstant(const string&, Type);
     virtual string getStr()const;
     virtual string getRepr()const;
+    virtual int getGrammarSymbolID()const;
+};
+
+class SymSet {
+    std::set<int> data;
+public:
+    SymSet(std::initializer_list<const string>);
+    void includeSymbol() { data.insert(-1); }
+    void includeConstant() { data.insert(-1); }
+
+    bool hasKeyword(const string&)const;
+    bool hasSymbol()const;
+    bool hasConstant()const;
+    bool has(const Atom*)const;
+    SymSet operator+(const SymSet &t)const;
+    unsigned size() { return data.size(); }
+
+    friend std::ostream& operator<< (std::ostream& os, const SymSet& t);
 };
