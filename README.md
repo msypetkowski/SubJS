@@ -117,10 +117,10 @@ Syntax
 Starting symbol is Program.
 ```C
 Program
-    = { Block }
+    = { Element }
     | epsilon
 
-Block
+Element
     = Declaration
     | OneLineCommaOperator OneLineCommaOperatorSeparator
 

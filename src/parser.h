@@ -19,7 +19,7 @@ class Parser {
     bool isCurAtomKeyword(const string&);
 
     // parsing tree node methods
-    void Block          (const SymSet& follow);
+    void Element        (const SymSet& follow);
     void Declaration    (const SymSet& follow);
     void DeclarationType(const SymSet& follow);
     void DeclarationElem(const SymSet& follow);

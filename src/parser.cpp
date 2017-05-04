@@ -3,14 +3,15 @@
 #include <iostream>
 #include <cassert>
 
-// const std::vector<string> ASSIGNMENT_OPERATORS={{
-//     "=", "+=", "-=", "*=", "/=", "^=", "&=", "|=", "%=",
-// }};
-#define ASSIGNMENT_OPERATORS { \
+#define ASSIGNMENT_OPERATORS_STRINGS { \
     "=", "+=", "-=", "*=", "/=", "^=", "&=", "|=", "%=", \
 }
-#define ADDITIVE_OPERATORS { "+", "-" }
-#define MULTIPLICATIVE_OPERATORS { "*", "/" }
+#define ADDITIVE_OPERATORS_STRINGS { "+", "-" }
+#define MULTIPLICATIVE_OPERATORS_STRINGS { "*", "/" }
+
+const static SymSet ASSIGNMENT_OPERATORS(ASSIGNMENT_OPERATORS_STRINGS);
+const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
+const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
 Parser::Parser(Lexer& l):lexer(l), canParse(true) {
     nextAtom();
@@ -65,7 +66,7 @@ bool Parser::isCurAtomKeyword(const string& repr) {
 
 /*
 Program
-    = { Block }
+    = { Element }
     | epsilon
 */
 void Parser::Program() {
@@ -73,14 +74,14 @@ void Parser::Program() {
     SymSet first = {"var", "let", "const", ";", "$"};
 
     while (!isCurAtomKeyword("$")) {
-        Block(first);
+        Element(first);
     }
 
     tb.treeNodeEnd();
 }
 
 /*
-Block
+Element
     = Declaration
     | OneLineCommaOperator OneLineCommaOperatorSeparator
 
@@ -103,11 +104,11 @@ Block
     | ';'
  */
 // TODO: implement whole
-void Parser::Block(const SymSet& follow) {
+void Parser::Element(const SymSet& follow) {
     SymSet first = {"var", "let", "const", ";"};
     Synchronize(this, first, follow);
     if (!canParse) return;
-    tb.treeNodeStart("Block");
+    tb.treeNodeStart("Element");
 
     if (isCurAtomKeyword("var")) {
         Declaration(follow);
@@ -232,8 +233,8 @@ void Parser::Expression                 (const SymSet& follow) {
 void Parser::AssignmentExpression       (const SymSet& follow) {
     tb.treeNodeStart("AssignmentExpression");
     // TODO: ConditionalExpression here
-    AdditiveExpression(follow + SymSet(ASSIGNMENT_OPERATORS));
-    if (SymSet(ASSIGNMENT_OPERATORS).has(curAtom)) {
+    AdditiveExpression(follow + ASSIGNMENT_OPERATORS);
+    if (ASSIGNMENT_OPERATORS.has(curAtom)) {
         AssignmentOperator({});
         AssignmentExpression(follow);
     }
@@ -277,8 +278,8 @@ void Parser::ShiftExpression            (const SymSet& follow) {
 }
 void Parser::AdditiveExpression         (const SymSet& follow) {
     tb.treeNodeStart("AdditiveExpression");
-    MultiplicativeExpression(follow + SymSet(ADDITIVE_OPERATORS));
-    if (SymSet(ADDITIVE_OPERATORS).has(curAtom)) {
+    MultiplicativeExpression(follow + ADDITIVE_OPERATORS);
+    if (ADDITIVE_OPERATORS.has(curAtom)) {
         AdditiveOperator({});
         AdditiveExpression(follow);
     }
@@ -286,8 +287,8 @@ void Parser::AdditiveExpression         (const SymSet& follow) {
 }
 void Parser::MultiplicativeExpression   (const SymSet& follow) {
     tb.treeNodeStart("MultiplicativeExpression");
-    UnaryExpression(follow + SymSet(MULTIPLICATIVE_OPERATORS));
-    if (SymSet(MULTIPLICATIVE_OPERATORS).has(curAtom)) {
+    UnaryExpression(follow + MULTIPLICATIVE_OPERATORS);
+    if (MULTIPLICATIVE_OPERATORS.has(curAtom)) {
         MultiplicativeOperator({});
         UnaryExpression(follow);
     }
@@ -423,7 +424,7 @@ void Parser::ShiftOperator              (const SymSet& follow) {
 }
 void Parser::AdditiveOperator           (const SymSet& follow) {
     tb.treeNodeStart("AdditiveOperator");
-    vector<string> ops = ADDITIVE_OPERATORS;
+    vector<string> ops = ADDITIVE_OPERATORS_STRINGS;
     for (string o : ops) {
         if (isCurAtomKeyword(o)) {
             acceptKeyword(o);
@@ -438,7 +439,7 @@ void Parser::AdditiveOperator           (const SymSet& follow) {
 }
 void Parser::MultiplicativeOperator     (const SymSet& follow) {
     tb.treeNodeStart("MultiplicativeOperator");
-    vector<string> ops = MULTIPLICATIVE_OPERATORS;
+    vector<string> ops = MULTIPLICATIVE_OPERATORS_STRINGS;
     for (string o : ops) {
         if (isCurAtomKeyword(o)) {
             acceptKeyword(o);
