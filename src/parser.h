@@ -18,6 +18,7 @@ class Parser {
 
     bool isCurAtomKeyword(const string&);
     bool isCurAtomConstant();
+    bool isCurAtomSymbol();
 
     // parsing tree node methods
     void Element        (const SymSet& follow);

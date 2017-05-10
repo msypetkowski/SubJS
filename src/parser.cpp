@@ -13,6 +13,13 @@ const static SymSet ASSIGNMENT_OPERATORS(ASSIGNMENT_OPERATORS_STRINGS);
 const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
 const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
+const static SymSet EXPRESSION_FIRST =
+    SymSet({"CONSTANT", "SYMBOL", "("});
+const static SymSet STATEMENT_FIRST =
+    SymSet({";", "var", "const", "let"}) + EXPRESSION_FIRST;
+const static SymSet ELEMENT_FIRST =
+    SymSet({"function"}) + STATEMENT_FIRST;
+
 Parser::Parser(Lexer& l):lexer(l), canParse(true) {
     nextAtom();
 }
@@ -67,6 +74,10 @@ bool Parser::isCurAtomConstant() {
     return dynamic_cast<AtomConstant*>(curAtom);
 }
 
+bool Parser::isCurAtomSymbol() {
+    return dynamic_cast<AtomSymbol*>(curAtom);
+}
+
 
 /*
 Program
@@ -75,7 +86,7 @@ Program
 */
 void Parser::Program() {
     tb.treeNodeStart("Program");
-    SymSet first = {"var", "let", "const", ";", "$", "CONSTANT"};
+    SymSet first = ELEMENT_FIRST + SymSet({"$"});
 
     while (!isCurAtomKeyword("$")) {
         Element(first);
@@ -151,14 +162,12 @@ ExpressionOpt
 */
 // TODO: implement whole
 void Parser::Element(const SymSet& follow) {
-    SymSet first = {"function", "var", "let", "const", ";", "CONSTANT"};
-    first.includeConstant();
-    std::cout<<curAtom->getStr()<<std::endl;
-    std::cout<<first.has(curAtom)<<std::endl;
+    SymSet first = ELEMENT_FIRST;
     Synchronize s(this, first, follow);
     if (!canParse) return;
     tb.treeNodeStart("Element");
 
+    std::cout<<curAtom->getStr()<<std::endl;
     if (isCurAtomKeyword("function")) {
         // TODO
         assert(0);
@@ -186,7 +195,7 @@ void Parser::Statements                 (const SymSet& follow){
     assert(0);
 }
 void Parser::Statement                  (const SymSet& follow){
-    SymSet first = {"var", "let", "const", ";", "CONSTANT"};
+    SymSet first = STATEMENT_FIRST;
     Synchronize s(this, first, follow);
     if (!canParse) return;
     tb.treeNodeStart("Statement");
@@ -230,12 +239,12 @@ void Parser::VariableType               (const SymSet& follow){
     tb.treeNodeEnd();
 }
 void Parser::VariablesOrExpression      (const SymSet& follow){
-    SymSet first = {"var", "let", "const", "CONSTANT"};
+    SymSet first = SymSet{"var", "let", "const"} + EXPRESSION_FIRST;
     Synchronize s(this, first, follow);
     if (!canParse) return;
     tb.treeNodeStart("VariablesOrExpression");
 
-    if (isCurAtomConstant()) {
+    if (EXPRESSION_FIRST.has(curAtom)) {
         Expression(follow);
     } else {
         VariableType(follow + SymSet{"SYMBOL"});
@@ -247,7 +256,6 @@ void Parser::VariablesOrExpression      (const SymSet& follow){
 void Parser::Variables                  (const SymSet& follow){
     SymSet first = {"SYMBOL"};
     Synchronize s(this, first, follow);
-
     if (!canParse) return;
     tb.treeNodeStart("Variables");
 
@@ -334,11 +342,16 @@ MultiplicativeExpression
 */
 
 void Parser::Expression                 (const SymSet& follow) {
+    SymSet first = EXPRESSION_FIRST;
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
     tb.treeNodeStart("Expression");
+
     AssignmentExpression(follow + SymSet{","});
     if (isCurAtomKeyword(",")) {
         Expression(follow);
     }
+
     tb.treeNodeEnd();
 }
 void Parser::AssignmentExpression       (const SymSet& follow) {
@@ -490,7 +503,7 @@ UnaryOperator
 void Parser::UnaryExpression            (const SymSet& follow) {
     // TODO: implement properly
     tb.treeNodeStart("UnaryExpression");
-    acceptConstant();
+    MemberExpression(follow);
     tb.treeNodeEnd();
 }
 void Parser::Constructor                (const SymSet& follow) {
@@ -502,8 +515,23 @@ void Parser::ConstructorCall            (const SymSet& follow) {
     assert(0);
 }
 void Parser::MemberExpression           (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("MemberExpression");
+
+    PrimaryExpression(follow + SymSet{".", "[", "("});
+    if (isCurAtomKeyword(".")) {
+        acceptKeyword(".");
+        MemberExpression(follow);
+    } else if (isCurAtomKeyword("[")) {
+        acceptKeyword("[");
+        Expression(follow + SymSet{"]"});
+        acceptKeyword("]");
+    } else if (isCurAtomKeyword("(")) {
+        acceptKeyword("(");
+        ArgumentListOpt(follow + SymSet{")"});
+        acceptKeyword(")");
+    }
+
+    tb.treeNodeEnd();
 }
 void Parser::ArgumentListOpt            (const SymSet& follow) {
     // TODO: implement
@@ -514,8 +542,21 @@ void Parser::ArgumentList               (const SymSet& follow) {
     assert(0);
 }
 void Parser::PrimaryExpression          (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("PrimaryExpression");
+
+    if (isCurAtomKeyword("(")) {
+        acceptKeyword("(");
+        Expression(follow + SymSet{")"});
+        acceptKeyword(")");
+    } else if (isCurAtomConstant()) {
+        acceptConstant();
+    } else if (isCurAtomSymbol()) {
+        acceptSymbol();
+    } else {
+        // TODO: false true null this
+    }
+
+    tb.treeNodeEnd();
 }
 void Parser::AssignmentOperator         (const SymSet& follow) {
     // TODO: implement
