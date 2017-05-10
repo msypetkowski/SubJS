@@ -33,6 +33,13 @@ namespace AtomTests
         BOOST_CHECK(!ss.hasConstant());
     }
 
+    BOOST_AUTO_TEST_CASE(testSymset2) {
+        SymSet first = {"function", "var", "let", "const", ";", "CONSTANT"};
+        first.includeConstant();
+        Atom* a = new AtomConstant({1,2},"1",AtomConstant::Type::Float);
+        BOOST_CHECK(first.has(a));
+    }
+
     BOOST_AUTO_TEST_CASE(testSymsetAdd) {
         SymSet ss1({"=", ","});
         ss1.includeConstant();

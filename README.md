@@ -121,42 +121,72 @@ Program
     | epsilon
 
 Element
-    = Declaration
-    | OneLineCommaOperator OneLineCommaOperatorSeparator
+    = function Identifier '(' ParameterListOpt ')' CompoundStatement
+    | Statement
 
-    | Symbol ExpressionRest
-    | Array ExpressionRest
-    | CommaOperator ExpressionRest
-    | new Expression
-    | FunctionExpression
+ParameterListOpt
+    = empty
+    | ParameterList
 
-    | IfStatement
-    | While
-    | DoWhile
-    | For
-    | Try
+ParameterList
+    = ident
+    | ident , ParameterList
 
-    | continue
-    | break
-    | return Expression
+CompoundStatement
+    = '{' Statements '}'
 
-    | ';'
-```
+Statements
+    = empty
+    | Statement Statements
 
-#### Declaration
-```C
-DeclarationType
+Statement
+    ;
+    if Condition Statement
+    if Condition Statement else Statement
+    while Condition Statement
+    ForParen ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    ForBegin ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    ForBegin in Expression ')' Statement
+    break ';'
+    continue ';'
+    with '(' Expression ')' Statement
+    return ExpressionOpt ';'
+    CompoundStatement
+    VariablesOrExpression ';'
+
+Condition
+    = '(' Expression ')'
+
+ForParen
+    = for '('
+
+ForBegin
+    = ForParen VariablesOrExpression
+
+VariableType
     = var
     | let
     | const
-Declaration
-    = DeclarationType DeclarationElem { ',' DeclarationElem }
-DeclarationElem
-    = ident '=' AssignmentExpression
-    | ident
+
+VariablesOrExpression
+    = VariableType Variables
+    | Expression
+
+Variables
+    = Variable
+    | Variable , Variables
+
+Variable
+    = ident
+    | ident = AssignmentExpression
+
+ExpressionOpt
+    = empty
+    | Expression
 ```
 
 #### OneLineCommaOperator
+TODO: think if it is needed
 Should contain at least one ','
 ```C
 OneLineCommaOperatorSeparator
@@ -306,45 +336,8 @@ UnaryOperator
     = '++'
 ```
 
-### FunctionExpression
-Function expression and definition
-```C
-FunctionExpression
-    = FunctionHead '{' Program '}'
-FunctionHead
-    = function ident '(' FunctionNextParam
-    | function ident '(' ')'
-    | function '(' FunctionNextParam
-    | function '(' ')'
-FunctionNextParam
-    = ident ',' FunctionNextParam
-    = ident ')'
-```
-
-### IfStatement
-```C
-IfStatement
-    = if CommaOperator '{' Program '}'
-    | if CommaOperator '{' Program '}' else '{' Program '}'
-```
-
-### While
-```C
-DoWhile
-    = do '{' Program '}' while CommaOperator
-While
-    = while CommaOperator '{' Program '}'
-```
-
-### For
-```C
-For
-    = for '(' Declaration ';' Expression ';' Expression ')' '{' program '}'
-    | for '(' Expression  ';' Expression ';' Expression ')' '{' program '}'
-```
-
 ### Try, Catch, Finally
-
+TODO
 ```C
 Try
     = try '{' Program '}' Catch

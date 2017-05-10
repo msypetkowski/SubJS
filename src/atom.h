@@ -150,7 +150,7 @@ public:
     SymSet(std::initializer_list<const string>);
     //SymSet(std::vector<const string>);
     void includeSymbol() { data.insert(-1); }
-    void includeConstant() { data.insert(-1); }
+    void includeConstant() { data.insert(-2); }
 
     bool hasKeyword(const string&)const;
     bool hasSymbol()const;

@@ -63,6 +63,10 @@ bool Parser::isCurAtomKeyword(const string& repr) {
         && curAtom->getRepr()==repr;
 }
 
+bool Parser::isCurAtomConstant() {
+    return dynamic_cast<AtomConstant*>(curAtom);
+}
+
 
 /*
 Program
@@ -71,7 +75,7 @@ Program
 */
 void Parser::Program() {
     tb.treeNodeStart("Program");
-    SymSet first = {"var", "let", "const", ";", "$"};
+    SymSet first = {"var", "let", "const", ";", "$", "CONSTANT"};
 
     while (!isCurAtomKeyword("$")) {
         Element(first);
@@ -82,71 +86,139 @@ void Parser::Program() {
 
 /*
 Element
-    = Declaration
-    | OneLineCommaOperator OneLineCommaOperatorSeparator
+    = function Identifier '(' ParameterListOpt ')' CompoundStatement
+    | Statement
 
-    | Symbol ExpressionRest
-    | Array ExpressionRest
-    | CommaOperator ExpressionRest
-    | new Expression
-    | FunctionExpression
+ParameterListOpt
+    = empty
+    | ParameterList
 
-    | IfStatement
-    | While
-    | DoWhile
-    | For
-    | Try
+ParameterList
+    = ident
+    | ident , ParameterList
 
-    | continue
-    | break
-    | return Expression
+CompoundStatement
+    = '{' Statements '}'
 
-    | ';'
- */
+Statements
+    = empty
+    | Statement Statements
+
+Statement
+    ;
+    if Condition Statement
+    if Condition Statement else Statement
+    while Condition Statement
+    ForParen ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    ForBegin ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    ForBegin in Expression ')' Statement
+    break ';'
+    continue ';'
+    with '(' Expression ')' Statement
+    return ExpressionOpt ';'
+    CompoundStatement
+    VariablesOrExpression ';'
+
+Condition
+    = '(' Expression ')'
+
+ForParen
+    = for '('
+
+ForBegin
+    = ForParen VariablesOrExpression
+
+VariableType
+    = var
+    | let
+    | const
+
+VariablesOrExpression
+    = VariableType Variables
+    | Expression
+
+Variables
+    = Variable
+    | Variable , Variables
+
+Variable
+    = ident
+    | ident = AssignmentExpression
+
+ExpressionOpt
+    = empty
+    | Expression
+*/
 // TODO: implement whole
 void Parser::Element(const SymSet& follow) {
-    SymSet first = {"var", "let", "const", ";"};
-    Synchronize(this, first, follow);
+    SymSet first = {"function", "var", "let", "const", ";", "CONSTANT"};
+    first.includeConstant();
+    std::cout<<curAtom->getStr()<<std::endl;
+    std::cout<<first.has(curAtom)<<std::endl;
+    Synchronize s(this, first, follow);
     if (!canParse) return;
     tb.treeNodeStart("Element");
 
-    if (isCurAtomKeyword("var")) {
-        Declaration(follow);
-    } else  if (isCurAtomKeyword(";")) {
+    if (isCurAtomKeyword("function")) {
+        // TODO
+        assert(0);
+    } else {
+        Statement(follow);
+    }
+
+    tb.treeNodeEnd();
+}
+
+void Parser::ParameterListOpt           (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::ParameterList              (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::CompoundStatement          (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::Statements                 (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::Statement                  (const SymSet& follow){
+    SymSet first = {"var", "let", "const", ";", "CONSTANT"};
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
+    tb.treeNodeStart("Statement");
+
+    // TODO: implement rest
+    if (isCurAtomKeyword(";")) {
+        acceptKeyword(";");
+    } else {
+        VariablesOrExpression(follow + SymSet{";"});
         acceptKeyword(";");
     }
 
     tb.treeNodeEnd();
 }
-
-/*
-Declaration
-    = DeclarationType DeclarationElem { ',' DeclarationElem }
-DeclarationType
-    = var
-    | let
-    | const
-DeclarationElem
-    = ident '=' AssignmentExpression
-    | ident
-*/
-void Parser::Declaration(const SymSet& follow) {
-    SymSet first{"var", "let", "const"};
-    Synchronize(this, first, follow);
-    if (!canParse) return;
-    tb.treeNodeStart("Declaration");
-
-    DeclarationType({"SYMBOL"});
-    DeclarationElem(follow + SymSet{","});
-    while (isCurAtomKeyword(",")) {
-        acceptKeyword(",");
-        DeclarationElem(follow + SymSet{","});
-    }
-
-    tb.treeNodeEnd();
+void Parser::Condition                  (const SymSet& follow){
+    // TODO: implement
+    assert(0);
 }
-void Parser::DeclarationType(const SymSet&) {
-    tb.treeNodeStart("DeclarationType");
+void Parser::ForParen                   (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::ForBegin                   (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
+void Parser::VariableType               (const SymSet& follow){
+    SymSet first = {"var", "let", "const"};
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
+    tb.treeNodeStart("VariableType");
+
     if (isCurAtomKeyword("var")) {
         acceptKeyword("var");
     } else if (isCurAtomKeyword("let")) {
@@ -154,18 +226,57 @@ void Parser::DeclarationType(const SymSet&) {
     } else if (isCurAtomKeyword("const")) {
         acceptKeyword("const");
     }
+
     tb.treeNodeEnd();
 }
-void Parser::DeclarationElem(const SymSet& follow) {
-    tb.treeNodeStart("DeclarationElem");
+void Parser::VariablesOrExpression      (const SymSet& follow){
+    SymSet first = {"var", "let", "const", "CONSTANT"};
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
+    tb.treeNodeStart("VariablesOrExpression");
+
+    if (isCurAtomConstant()) {
+        Expression(follow);
+    } else {
+        VariableType(follow + SymSet{"SYMBOL"});
+        Variables(follow);
+    }
+
+    tb.treeNodeEnd();
+}
+void Parser::Variables                  (const SymSet& follow){
+    SymSet first = {"SYMBOL"};
+    Synchronize s(this, first, follow);
+
+    if (!canParse) return;
+    tb.treeNodeStart("Variables");
+
+    Variable(follow + SymSet{","});
+    while (isCurAtomKeyword(",")) {
+        acceptKeyword(",");
+        Variable(follow + SymSet{","});
+    }
+
+    tb.treeNodeEnd();
+}
+void Parser::Variable                   (const SymSet& follow){
+    SymSet first = {"SYMBOL"};
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
+    tb.treeNodeStart("Variable");
+
     acceptSymbol();
     if (isCurAtomKeyword("=")) {
         acceptKeyword("=");
         AssignmentExpression(follow);
     }
+
     tb.treeNodeEnd();
 }
-
+void Parser::ExpressionOpt              (const SymSet& follow){
+    // TODO: implement
+    assert(0);
+}
 
 /*
 Expression

@@ -69,13 +69,20 @@ int AtomConstant::getGrammarSymbolID()const {
     return -2;
 }
 
+static int getKeywordId(const string& s) {
+    if (!KEYWORDS_MAP.count(s)) {
+        throw std::string("Wrong keyword string");
+    }
+    return KEYWORDS_MAP[s];
+}
+
 SymSet::SymSet(std::initializer_list<const string> l) {
     for (string s : l) {
         if (s=="SYMBOL")
             includeSymbol();
         else if (s=="CONSTANT")
             includeConstant();
-        else data.insert(KEYWORDS_MAP[s]);
+        else data.insert(getKeywordId(s));
     }
 }
 
@@ -90,7 +97,7 @@ SymSet::SymSet(std::initializer_list<const string> l) {
 // }
 
 bool SymSet::hasKeyword(const string&s )const {
-    return data.count(KEYWORDS_MAP[s]);
+    return data.count(getKeywordId(s));
 }
 bool SymSet::hasSymbol()const {
     return data.count(-1);

@@ -17,12 +17,24 @@ class Parser {
     void acceptSymbol();
 
     bool isCurAtomKeyword(const string&);
+    bool isCurAtomConstant();
 
     // parsing tree node methods
     void Element        (const SymSet& follow);
-    void Declaration    (const SymSet& follow);
-    void DeclarationType(const SymSet& follow);
-    void DeclarationElem(const SymSet& follow);
+    void ParameterListOpt           (const SymSet& follow);
+    void ParameterList              (const SymSet& follow);
+    void CompoundStatement          (const SymSet& follow);
+    void Statements                 (const SymSet& follow);
+    void Statement                  (const SymSet& follow);
+    void Condition                  (const SymSet& follow);
+    void ForParen                   (const SymSet& follow);
+    void ForBegin                   (const SymSet& follow);
+    void VariableType               (const SymSet& follow);
+    void VariablesOrExpression      (const SymSet& follow);
+    void Variables                  (const SymSet& follow);
+    void Variable                   (const SymSet& follow);
+    void ExpressionOpt              (const SymSet& follow);
+
 
     void Expression                 (const SymSet& follow);
     void AssignmentExpression       (const SymSet& follow);
@@ -94,6 +106,7 @@ public:
     Parser *parser;
     Synchronize(Parser *p, const SymSet& ss, const SymSet& fs)
             :follow(fs), parser(p) {
+
         if(!ss.has(parser->curAtom)) {
             parser->notExpectedAtomError(parser->curAtom);
             skipto(ss+follow);
