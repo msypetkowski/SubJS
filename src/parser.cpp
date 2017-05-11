@@ -534,12 +534,19 @@ void Parser::MemberExpression           (const SymSet& follow) {
     tb.treeNodeEnd();
 }
 void Parser::ArgumentListOpt            (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("ArgumentListOpt");
+    if (!isCurAtomKeyword(")"))
+        ArgumentList(follow);
+    tb.treeNodeEnd();
 }
 void Parser::ArgumentList               (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("ArgumentList");
+    AssignmentExpression(follow + SymSet{","});
+    while (isCurAtomKeyword(",")) {
+        acceptKeyword(",");
+        AssignmentExpression(follow + SymSet{","});
+    }
+    tb.treeNodeEnd();
 }
 void Parser::PrimaryExpression          (const SymSet& follow) {
     tb.treeNodeStart("PrimaryExpression");
@@ -559,8 +566,19 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
     tb.treeNodeEnd();
 }
 void Parser::AssignmentOperator         (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("AssignmentOperator");
+    vector<string> ops = ASSIGNMENT_OPERATORS_STRINGS;
+    for (string o : ops) {
+        if (isCurAtomKeyword(o)) {
+            acceptKeyword(o);
+            tb.treeNodeEnd();
+            return;
+        }
+    }
+    string msg = "Expected AssignmentOperator got: " + curAtom->getStr();
+    errorsPositions.push_back(curAtom->getPos());
+    errorsMessages.push_back(msg);
+    tb.treeNodeEnd();
 }
 void Parser::EqualityOperator           (const SymSet& follow) {
     // TODO: implement
