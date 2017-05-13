@@ -14,11 +14,12 @@ class Value {
     float floatData;
     int intData;
     string stringData;
+    std::vector<Value> arrayData;
     Context* context;
 public:
-    Value(){};
+    Value():type("undefined"){};
     Value(Context*, Atom*);
-    Value(Context* c):context(c){};
+    Value(Context* c):type("undefined"),context(c){};
 
     Value op(string op, Value);
     Value member(Value); // operator "."
@@ -81,6 +82,7 @@ class Interpreter {
     std::vector<Value> ArgumentListOpt(Node* n);
     std::vector<Value> ArgumentList   (Node* n);
     Value PrimaryExpression           (Node* n);
+    Value ArrayExpression             (Node* n);
     Value AssignmentOperator          (Node* n);
     Value EqualityOperator            (Node* n);
     Value RelationalOperator          (Node* n);

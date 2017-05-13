@@ -22,7 +22,7 @@ static string parseStringLiteral(string lit) {
     return ret;
 }
 
-Value::Value(Context* c, Atom* a):context(c) {
+Value::Value(Context* c, Atom* a):type("undefined"), context(c) {
     AtomConstant* ac;
     AtomSymbol* as;
     if ((ac=dynamic_cast<AtomConstant*>(a))) {
@@ -108,8 +108,11 @@ Value Value::member(Value) {
 }
 Value Value::call(std::vector<Value>& args) {
     if (type == "symbol" && stringData == "print") {
-        for(Value v : args) {
-            std::cout << v.getRepr() << " ";
+        for(unsigned i=0; i<args.size(); ++i) {
+            if (i == args.size() - 1)
+                std::cout << args[i].getRepr();
+            else
+                std::cout << args[i].getRepr() << " ";
         }
         std::cout<<std::endl;
         Value ret(context);
@@ -132,6 +135,16 @@ string Value::getRepr() {
         return stringData;
     else if (type == "symbol")
         return context->getValue(stringData).getRepr();
+    else if (type == "undefined")
+        return "";
+    else if (type == "array") {
+        string ret;
+        for(auto v:arrayData) {
+            ret += v.getRepr() + ",";
+        }
+        ret = ret.substr(0, ret.size()-1);
+        return ret;
+    }
     assert(0);
     return "";
 }
@@ -334,9 +347,36 @@ std::vector<Value> Interpreter::ArgumentList               (Node* n) {
 Value Interpreter::PrimaryExpression          (Node* n) {
     assert(n->name == "PrimaryExpression");
     if (n->subNodes.size() == 3) {
-        return Expression(n->subNodes[1].get());
+        string op = n->subNodes[0]->data->getRepr();
+        if (op == "(") {
+            return Expression(n->subNodes[1].get());
+        } else if (op == "[") {
+            return ArrayExpression(n->subNodes[1].get());
+        }
     }
     return Value(&context, n->subNodes[0]->data);
+}
+Value Interpreter::ArrayExpression             (Node* n) {
+    assert(n->name == "ArrayExpression");
+    unsigned cur = 0;
+    std::vector<Value> arrayElems;
+    bool lastWasComma = true;
+    while(cur < n->subNodes.size()) {
+        auto arrayElem = n->subNodes[cur];
+        if (arrayElem->name == "AssignmentExpression") {
+            arrayElems.push_back(AssignmentExpression(arrayElem.get()));
+            lastWasComma = false;
+        } else if (arrayElem->data) {
+            if (lastWasComma)
+                arrayElems.push_back(Value(&context));
+            lastWasComma = true;
+        }
+        ++cur;
+    }
+    Value ret(&context);
+    ret.type = "array";
+    ret.arrayData = arrayElems;
+    return ret;
 }
 // Value Interpreter::AssignmentOperator         (Node* n);
 // Value Interpreter::EqualityOperator           (Node* n);

@@ -292,10 +292,14 @@ PrimaryExpression
     = '(' Expression ')'
     | ident
     | constant
+    | '[' ArrayExpression ']'
     | false
     | true
     | null
     | this
+
+ArrayExpression
+    = { AssignmentExpression ',' | ',' | epsilon}
 
 AssignmentOperator
     = '='

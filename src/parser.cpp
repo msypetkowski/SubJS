@@ -14,7 +14,7 @@ const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
 const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
 const static SymSet EXPRESSION_FIRST =
-    SymSet({"CONSTANT", "SYMBOL", "("});
+    SymSet({"CONSTANT", "SYMBOL", "(", "["});
 const static SymSet STATEMENT_FIRST =
     SymSet({";", "var", "const", "let"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
@@ -457,10 +457,14 @@ PrimaryExpression
     = '(' Expression ')'
     | ident
     | constant
+    | '[' ArrayExpression ']'
     | false
     | true
     | null
     | this
+
+ArrayExpression
+    = { AssignmentExpression ',' | ',' | epsilon}
 
 AssignmentOperator
     = '='
@@ -553,16 +557,33 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
 
     if (isCurAtomKeyword("(")) {
         acceptKeyword("(");
-        Expression(follow + SymSet{")"});
+        Expression(SymSet{")"});
         acceptKeyword(")");
     } else if (isCurAtomConstant()) {
         acceptConstant();
     } else if (isCurAtomSymbol()) {
         acceptSymbol();
+    } else if (isCurAtomKeyword("[")) {
+        acceptKeyword("[");
+        ArrayExpression(SymSet{"]"});
+        acceptKeyword("]");
     } else {
         // TODO: false true null this
     }
 
+    tb.treeNodeEnd();
+}
+void Parser::ArrayExpression          (const SymSet& follow) {
+    tb.treeNodeStart("ArrayExpression");
+    while (!isCurAtomKeyword("]")) {
+        if (isCurAtomKeyword(",")) {
+            acceptKeyword(",");
+        } else if (EXPRESSION_FIRST.has(curAtom)) {
+            AssignmentExpression(follow + SymSet{","});
+            if (!isCurAtomKeyword("]"))
+                acceptKeyword(",");
+        }
+    }
     tb.treeNodeEnd();
 }
 void Parser::AssignmentOperator         (const SymSet& follow) {

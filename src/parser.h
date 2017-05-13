@@ -57,6 +57,7 @@ class Parser {
     void ArgumentListOpt            (const SymSet& follow);
     void ArgumentList               (const SymSet& follow);
     void PrimaryExpression          (const SymSet& follow);
+    void ArrayExpression            (const SymSet& follow);
     void AssignmentOperator         (const SymSet& follow);
     void EqualityOperator           (const SymSet& follow);
     void RelationalOperator         (const SymSet& follow);
