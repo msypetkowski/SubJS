@@ -28,6 +28,7 @@ test_sources.append(Glob('_build/lexer.o'))
 test_sources.append(Glob('_build/atom.o'))
 test_sources.append(Glob('_build/parser.o'))
 test_sources.append(Glob('_build/tree.o'))
+test_sources.append(Glob('_build/interpr.o'))
 build_test = env_test.Program(target = 'test', source = test_sources);
 Depends(build_test, build)
 

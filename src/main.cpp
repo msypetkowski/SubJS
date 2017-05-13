@@ -1,6 +1,7 @@
 #include "source.h"
 #include "lexer.h"
 #include "parser.h"
+#include "interpr.h"
 
 #include <iostream>
 #include <boost/program_options.hpp>
@@ -100,8 +101,27 @@ int main(int argc, char **argv) {
                 cout << endl;
             }
         }
-    } else {
-        cout << "Interpretation is not implemented" << endl;
+    } else { // interpretation
+        Lexer l(source);
+        Parser p(l);
+        p.Program();
+        if (p.getErrorsMessages().empty()) {
+            Interpreter i(p.getTreeRoot());
+            i.run();
+        } else {
+            cout << "Errors:" << endl;
+            assert(p.getErrorsPositions().size() == p.getErrorsMessages().size());
+            for (auto tup : boost::combine(
+                        p.getErrorsPositions(), p.getErrorsMessages())) {
+                std::pair<unsigned, unsigned> pos;
+                string msg;
+                boost::tie(pos,msg) = tup;
+                cout << msg << endl;
+                cout << "at line: " << pos.first + 1 << " ";
+                cout << "at collumnn: " << pos.second + 1 << endl;
+                cout << endl;
+            }
+        }
     }
 
     return 0;

@@ -92,6 +92,7 @@ public:
     }
 
     string getTreeStr() { return tb.getTreeStr(); }
+    std::shared_ptr<Node> getTreeRoot() { return tb.getTreeRoot(); }
 
 };
 

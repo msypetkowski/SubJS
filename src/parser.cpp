@@ -167,7 +167,6 @@ void Parser::Element(const SymSet& follow) {
     if (!canParse) return;
     tb.treeNodeStart("Element");
 
-    std::cout<<curAtom->getStr()<<std::endl;
     if (isCurAtomKeyword("function")) {
         // TODO
         assert(0);
@@ -414,7 +413,7 @@ void Parser::MultiplicativeExpression   (const SymSet& follow) {
     UnaryExpression(follow + MULTIPLICATIVE_OPERATORS);
     if (MULTIPLICATIVE_OPERATORS.has(curAtom)) {
         MultiplicativeOperator({});
-        UnaryExpression(follow);
+        MultiplicativeExpression(follow);
     }
     tb.treeNodeEnd();
 }
