@@ -36,6 +36,10 @@ c=a+b;
 a=2;
 print(a,b,c);
 ''', b'2 6 7'),
+    ('a=1,2,3; print(a);', b'1'),
+    ('a=(1,2,3); print(a);', b'3'),
+    ('print((1,2,3)*3);', b'9'),
+    ('a=4,b=5,print(a+b);', b'9'),
 ]
 
 anyFail = False
@@ -47,6 +51,7 @@ for code, stdout in finalTests:
         print("Wrong answer for code:")
         print(code)
         print("\nExpected:",stdout)
-        print("----------")
+        print("Got:",stdout1)
+        print("-----------------------------")
 if not anyFail:
-    print("All final tests passed.")
+    print("All {} final tests passed.".format(len(finalTests)))

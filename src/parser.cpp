@@ -348,6 +348,7 @@ void Parser::Expression                 (const SymSet& follow) {
 
     AssignmentExpression(follow + SymSet{","});
     if (isCurAtomKeyword(",")) {
+        acceptKeyword(",");
         Expression(follow);
     }
 
