@@ -22,7 +22,7 @@ static string parseStringLiteral(string lit) {
     return ret;
 }
 
-Value::Value(Atom* a) {
+Value::Value(Context* c, Atom* a):context(c) {
     AtomConstant* ac;
     AtomSymbol* as;
     if ((ac=dynamic_cast<AtomConstant*>(a))) {
@@ -47,13 +47,29 @@ Value::Value(Atom* a) {
     }
 }
 
-Value Value::op(string op, Value v) {
-    Value ret;
-    if (type == "string" && v.type == "string") {
+Value Value::op(string opr, Value v) {
+    Value ret(context);
+    if (opr == "=") {
+        if (type != "symbol") {
+            // TODO: error handling
+            assert(0);
+        }
+        if (v.type == "symbol") {
+            // TODO: referention
+            Value lVal = context->getValue(v.stringData);
+            context->addVariable(stringData, lVal);
+            ret = lVal;
+        } else {
+            context->addVariable(stringData, v);
+            ret = v;
+        }
+    } else if (opr == "+=") {
+        ret = op("=", op("+",v));
+    } else if (type == "string" && v.type == "string") {
         ret.type = "string";
-        if (op == "+") {
+        if (opr == "+") {
             ret.stringData = stringData + v.stringData;
-        } else if (op == "-") {
+        } else if (opr == "-") {
             // TODO; error handling
             assert(0);
         } else {
@@ -62,16 +78,22 @@ Value Value::op(string op, Value v) {
         }
     } else if (type == "int" && v.type == "int") {
         ret.type = "int";
-        if (op == "+") {
+        if (opr == "+") {
             ret.intData = intData + v.intData;
-        } else if (op == "-") {
+        } else if (opr == "-") {
             ret.intData = intData - v.intData;
-        } else if (op == "*") {
+        } else if (opr == "*") {
             ret.intData = intData * v.intData;
         } else {
             // TODO: unknown operator
             assert(0);
         }
+    } else if (type == "symbol") {
+        Value myVal = context->getValue(stringData);
+        ret = myVal.op(opr, v);
+    } else if (v.type == "symbol") {
+        Value vVal = context->getValue(v.stringData);
+        ret = op(opr, vVal);
     } else {
         // TODO; implement
         assert(0);
@@ -82,21 +104,15 @@ Value Value::op(string op, Value v) {
 Value Value::member(Value) {
     // TODO; implement
     assert(0);
-    return Value();
+    return Value(context);
 }
 Value Value::call(std::vector<Value>& args) {
     if (type == "symbol" && stringData == "print") {
         for(Value v : args) {
-            if (v.type == "int")
-                std::cout<<v.intData<<" ";
-            else if (v.type == "float")
-                std::cout<<v.floatData<<" ";
-            else if (v.type == "string")
-                std::cout<<v.stringData<<" ";
-            else  assert(0);
+            std::cout << v.getRepr() << " ";
         }
         std::cout<<std::endl;
-        Value ret;
+        Value ret(context);
         ret.type="undefined";
         return ret;
     } else {
@@ -104,7 +120,20 @@ Value Value::call(std::vector<Value>& args) {
         assert(0);
     }
     assert(0);
-    return Value();
+    return Value(context);
+}
+
+string Value::getRepr() {
+    if (type == "int")
+        return std::to_string(intData);
+    else if (type == "float")
+        return std::to_string(floatData);
+    else if (type == "string")
+        return stringData;
+    else if (type == "symbol")
+        return context->getValue(stringData).getRepr();
+    assert(0);
+    return "";
 }
 
 void Interpreter::run() {
@@ -181,20 +210,26 @@ void Interpreter::VariableType               (Node* n) {
 }
 void Interpreter::VariablesOrExpression      (Node* n) {
     assert(n->name == "VariablesOrExpression");
-    if (n->name == "Variables") {
-        Variables(n->subNodes[1].get());
-    } else {
+    if (n->subNodes[0]->name == "Expression") {
         Expression(n->subNodes[0].get());
+    } else {
+        Variables(n->subNodes[1].get());
     }
 }
 void Interpreter::Variables                  (Node* n) {
-    // TODO: implement
-    assert(0);
+    assert(n->name == "Variables");
+    for (unsigned i=0; i<n->subNodes.size(); i+=2) {
+        Variable(n->subNodes[i].get());
+    }
 }
-// void Interpreter::Variable                   (Node* n) {
-//     // TODO: implement
-//     assert(0);
-// }
+void Interpreter::Variable                   (Node* n) {
+    assert(n->name == "Variable");
+    if (n->subNodes.size() == 3) {
+        string varname = n->subNodes[0]->data->getRepr();
+        Value v = AssignmentExpression(n->subNodes[2].get());
+        context.addVariable(varname, v);
+    }
+}
 // void Interpreter::ExpressionOpt              (Node* n) {
 //     // TODO: implement
 //     assert(0);
@@ -213,8 +248,8 @@ Value Interpreter::AssignmentExpression       (Node* n) {
     // TODO: ConditionalExpression here
     Value v = AdditiveExpression(n->subNodes[0].get());
     if (n->subNodes.size() == 3){
-        // TODO: implement
-        assert(0);
+        string op = n->subNodes[1]->subNodes[0]->data->getRepr();
+        return v.op(op, AssignmentExpression(n->subNodes[2].get()));
     }
     return v;
 }
@@ -301,7 +336,7 @@ Value Interpreter::PrimaryExpression          (Node* n) {
     if (n->subNodes.size() == 3) {
         return Expression(n->subNodes[1].get());
     }
-    return Value(n->subNodes[0]->data);
+    return Value(&context, n->subNodes[0]->data);
 }
 // Value Interpreter::AssignmentOperator         (Node* n);
 // Value Interpreter::EqualityOperator           (Node* n);

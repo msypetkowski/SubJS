@@ -4,25 +4,39 @@
 #include "tree.h"
 
 #include <map>
+#include <iostream> // TODO: remove
+
+class Context;
 
 class Value {
+    public: // TODO: remove
     string type;
     float floatData;
     int intData;
     string stringData;
+    Context* context;
 public:
-    Value(Atom*);
     Value(){};
+    Value(Context*, Atom*);
+    Value(Context* c):context(c){};
 
     Value op(string op, Value);
     Value member(Value); // operator "."
     Value call(std::vector<Value>&);
+
+    string getRepr();
 };
 
 class Context {
     std::map<string, Value> variables;
 public:
-    void addVariable(Atom* ident, Value value);
+    void addVariable(string varName, Value value) {
+        variables[varName] = value;
+    }
+    Value getValue(string name) {
+        return variables[name];
+    };
+    //Value getValue(string name) { return Value(this); };
 };
 
 class Interpreter {
