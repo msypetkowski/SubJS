@@ -125,7 +125,7 @@ Value Value::call(std::vector<Value>& args) {
         if (type == "symbol")
             return context->getValue(stringData).call(args);
         if (type == "function" && stringData == "Function") {
-            std::cout<<"Constructing Function object detected.\n";
+            std::cout<<"Function object constructor call detected.\n";
             std::cout<<"Arguments are: \n";
             for (auto a : args) {
                 std::cout<<": "<<a.getRepr();
@@ -198,6 +198,9 @@ string Value::getRepr() {
                 ret += v.getRepr() + ",";
         }
         ret = ret.substr(0, ret.size()-1);
+        return ret;
+    } else if (type == "function") {
+        string ret = "function " + stringData + "() {\n    [native code]\n}";
         return ret;
     }
     assert(0);

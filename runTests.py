@@ -81,6 +81,17 @@ a=[1,2,3];
 b=[1,,a,6];
 print(b[2][2]);
 ''', b'3'),
+
+    ('''
+a = []["constructor"];
+print(a);
+''', b'function Array() {\n    [native code]\n}'),
+
+    ('''
+b = "constr"+"uctor";
+a = []["constructo" +  'r'][b];
+print(a);
+''', b'function Function() {\n    [native code]\n}'),
 ]
 
 anyFail = False
@@ -106,3 +117,29 @@ for code, stdout in finalTests:
         print("-----------------------------")
 if not anyFail:
     print("All {} final tests passed.".format(len(finalTests)))
+
+# print( '''
+# -----------------------\\
+# Running big final tests|
+# -----------------------/
+# ''')
+# 
+# from bigTests import bigTests
+# 
+# anyFail = False
+# for code in bigTests:
+#     p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+#     stdout1 = p.communicate()[0].strip()
+# 
+#     p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+#     stdout2 = p2.communicate(code.encode())[0].strip()
+# 
+#     if (stdout1 != stdout2):
+#         anyFail = True
+#         print("Wrong answer for code:")
+#         print(code)
+#         print("\nExpected:",stdout2)
+#         print("Got:",stdout1)
+#         print("-----------------------------")
+# if not anyFail:
+#     print("All {} big final tests passed.".format(len(bigTests)))

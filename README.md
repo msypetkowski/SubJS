@@ -275,10 +275,11 @@ ConstructorCall
     | ident . ConstructorCall
 
 MemberExpression
-    = PrimaryExpression
-    | PrimaryExpression '.' MemberExpression
-    | PrimaryExpression '[' Expression ']'
-    | PrimaryExpression '(' ArgumentListOpt ')'
+    = PrimaryExpression {
+        '.' PrimaryExpression
+        | '[' Expression ']'
+        | '(' ArgumentListOpt ')'
+    }
 
 ArgumentListOpt
     = epsilon
