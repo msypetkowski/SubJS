@@ -63,6 +63,14 @@ b=[,,1,,2];
 print(a);
 print(b);
 ''', b',,1,,2\n,,1,,2'),
+
+    ('print([9,8,7][1]);', b'8'),
+
+    ('''
+print([,,,][1]);
+print([1,2,3][1,2]);
+print([1,22,3,4][0,2,'test',1]);
+''', b'undefined\n3\n22'),
 ]
 
 anyFail = False
@@ -70,13 +78,20 @@ for code, stdout in finalTests:
     p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
     stdout1 = p.communicate()[0].strip()
 
-    p = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout2 = p.communicate(code.encode())[0].strip()
-    if (stdout1 != stdout or stdout2 != stdout):
+    p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout2 = p2.communicate(code.encode())[0].strip()
+    if (stdout != stdout2):
+        anyFail = True
+        print("Invalid test case")
+        print("\nReal JavaScript output:",stdout2)
+        print("Testcase out is:",stdout)
+        continue
+
+    if (stdout1 != stdout):
         anyFail = True
         print("Wrong answer for code:")
         print(code)
-        print("\nExpected:",stdout2)
+        print("\nExpected:",stdout)
         print("Got:",stdout1)
         print("-----------------------------")
 if not anyFail:

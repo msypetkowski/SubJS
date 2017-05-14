@@ -25,6 +25,8 @@ public:
     Value member(Value); // operator "."
     Value call(std::vector<Value>&);
 
+    Value operator[](const Value&);
+
     string getRepr();
 };
 

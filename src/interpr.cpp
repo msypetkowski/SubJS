@@ -126,6 +126,36 @@ Value Value::call(std::vector<Value>& args) {
     return Value(context);
 }
 
+Value Value::operator[](const Value& v) {
+    if (type == "array") {
+        Value val = v;
+        if (v.type == "symbol")
+            val = context->getValue(v.stringData);
+
+        if (val.type == "string" && val.stringData == "constructor") {
+            Value ret = Value(context);
+            ret.type = "function";
+            if (type == "array") {
+                ret.stringData = "Array";
+            } else if (type == "function") {
+                ret.stringData = "Function";
+            } else {
+                // TODO: implement
+                assert(0);
+            }
+        }
+
+        if (val.type == "int") {
+            if (val.intData >= 0 && (unsigned)val.intData < arrayData.size()) {
+                return arrayData[val.intData];
+            } else return Value();
+        } else return Value();
+    } else {
+        // undefined
+        return Value();
+    }
+}
+
 string Value::getRepr() {
     if (type == "int")
         return std::to_string(intData);
@@ -136,11 +166,14 @@ string Value::getRepr() {
     else if (type == "symbol")
         return context->getValue(stringData).getRepr();
     else if (type == "undefined")
-        return "";
+        return "undefined";
     else if (type == "array") {
         string ret;
         for(auto v:arrayData) {
-            ret += v.getRepr() + ",";
+            if (v.type == "undefined")
+                ret += ",";
+            else
+                ret += v.getRepr() + ",";
         }
         ret = ret.substr(0, ret.size()-1);
         return ret;
@@ -323,8 +356,8 @@ Value Interpreter::MemberExpression           (Node* n) {
             std::vector<Value> args=ArgumentListOpt(n->subNodes[2].get());
             v.call(args);
         } else if (op == "[") {
-            // TODO: implement
-            assert(0);
+            Value key = Expression(n->subNodes[2].get());
+            return v[key];
         } else assert(0);
     }
     return v;
