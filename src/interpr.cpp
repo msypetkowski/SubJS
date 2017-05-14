@@ -107,6 +107,9 @@ Value Value::member(Value) {
     return Value(context);
 }
 Value Value::call(std::vector<Value>& args) {
+    if (type == "undefined") {
+        return Value(context);
+    }
     if (type == "symbol" && stringData == "print") {
         for(unsigned i=0; i<args.size(); ++i) {
             if (i == args.size() - 1)
@@ -119,6 +122,21 @@ Value Value::call(std::vector<Value>& args) {
         ret.type="undefined";
         return ret;
     } else {
+        if (type == "symbol")
+            return context->getValue(stringData).call(args);
+        if (type == "function" && stringData == "Function") {
+            std::cout<<"Constructing Function object detected.\n";
+            std::cout<<"Arguments are: \n";
+            for (auto a : args) {
+                std::cout<<": "<<a.getRepr();
+            }
+            std::cout<<std::endl;
+            // TODO: interpret it deeper?
+            return Value(context);
+        }
+
+        std::cout<<type<<std::endl;
+
         // TODO; implement
         assert(0);
     }
@@ -127,24 +145,28 @@ Value Value::call(std::vector<Value>& args) {
 }
 
 Value Value::operator[](const Value& v) {
-    if (type == "array") {
-        Value val = v;
-        if (v.type == "symbol")
-            val = context->getValue(v.stringData);
+    if (type == "symbol")
+        return context->getValue(stringData)[v];
+    Value val = v;
+    if (v.type == "symbol")
+        val = context->getValue(v.stringData);
 
-        if (val.type == "string" && val.stringData == "constructor") {
-            Value ret = Value(context);
-            ret.type = "function";
-            if (type == "array") {
-                ret.stringData = "Array";
-            } else if (type == "function") {
-                ret.stringData = "Function";
-            } else {
-                // TODO: implement
-                assert(0);
-            }
+    if (val.type == "string" && val.stringData == "constructor") {
+        Value ret = Value(context);
+        ret.type = "function";
+        if (type == "array") {
+            ret.stringData = "Array";
+        } else if (type == "function") {
+            ret.stringData = "Function";
+        } else {
+            // TODO: implement
+            std::cout<<type<<std::endl;
+            assert(0);
         }
+        return ret;
+    }
 
+    if (type == "array") {
         if (val.type == "int") {
             if (val.intData >= 0 && (unsigned)val.intData < arrayData.size()) {
                 return arrayData[val.intData];
@@ -345,20 +367,23 @@ Value Interpreter::UnaryExpression            (Node* n) {
 Value Interpreter::MemberExpression           (Node* n) {
     assert(n->name == "MemberExpression");
     Value v = PrimaryExpression(n->subNodes[0].get());
-    if (n->subNodes.size() == 3) {
-        string op = n->subNodes[1]->data->getRepr();
-        assert(op==".");
-        return v.member(MemberExpression(n->subNodes[2].get()));
-    }
-    if (n->subNodes.size() == 4) {
-        string op = n->subNodes[1]->data->getRepr();
-        if (op == "(") {
-            std::vector<Value> args=ArgumentListOpt(n->subNodes[2].get());
-            v.call(args);
-        } else if (op == "[") {
-            Value key = Expression(n->subNodes[2].get());
-            return v[key];
-        } else assert(0);
+
+    unsigned cur = 1;
+    while(cur < n->subNodes.size()) {
+        if (n->subNodes[cur]->data->getRepr() == ".") {
+            v = v.member(PrimaryExpression(n->subNodes[cur+1].get()));
+            cur += 2;
+        } else if (n->subNodes[cur]->data->getRepr() == "(") {
+            std::vector<Value> args=ArgumentListOpt(n->subNodes[cur+1].get());
+            v = v.call(args);
+            cur += 3;
+        } else if (n->subNodes[cur]->data->getRepr() == "[") {
+            Value key = Expression(n->subNodes[cur+1].get());
+            v = v[key];
+            cur += 3;
+        } else {
+            assert(0);
+        }
     }
     return v;
 }

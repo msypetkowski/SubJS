@@ -440,10 +440,11 @@ ConstructorCall
     | ident . ConstructorCall
 
 MemberExpression
-    = PrimaryExpression
-    | PrimaryExpression '.' MemberExpression
-    | PrimaryExpression '[' Expression ']'
-    | PrimaryExpression '(' ArgumentListOpt ')'
+    = PrimaryExpression {
+        '.' PrimaryExpression
+        | '[' Expression ']'
+        | '(' ArgumentListOpt ')'
+    }
 
 ArgumentListOpt
     = epsilon
@@ -522,17 +523,20 @@ void Parser::MemberExpression           (const SymSet& follow) {
     tb.treeNodeStart("MemberExpression");
 
     PrimaryExpression(follow + SymSet{".", "[", "("});
-    if (isCurAtomKeyword(".")) {
-        acceptKeyword(".");
-        MemberExpression(follow);
-    } else if (isCurAtomKeyword("[")) {
-        acceptKeyword("[");
-        Expression(follow + SymSet{"]"});
-        acceptKeyword("]");
-    } else if (isCurAtomKeyword("(")) {
-        acceptKeyword("(");
-        ArgumentListOpt(follow + SymSet{")"});
-        acceptKeyword(")");
+
+    while (1) {
+        if (isCurAtomKeyword(".")) {
+            acceptKeyword(".");
+            PrimaryExpression(follow + SymSet{".", "[", "("});
+        } else if (isCurAtomKeyword("[")) {
+            acceptKeyword("[");
+            Expression(follow + SymSet{"]"});
+            acceptKeyword("]");
+        } else if (isCurAtomKeyword("(")) {
+            acceptKeyword("(");
+            ArgumentListOpt(follow + SymSet{")"});
+            acceptKeyword(")");
+        } else break;
     }
 
     tb.treeNodeEnd();
