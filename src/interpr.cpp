@@ -126,11 +126,11 @@ Value Value::call(std::vector<Value>& args) {
             return context->getValue(stringData).call(args);
         if (type == "function" && stringData == "Function") {
             std::cout<<"Function object constructor call detected.\n";
-            std::cout<<"Arguments are: \n";
+            std::cout<<"Arguments are: ( \n";
             for (auto a : args) {
-                std::cout<<": "<<a.getRepr();
+                std::cout<<""<<a.getRepr()<<std::endl;
             }
-            std::cout<<std::endl;
+            std::cout<<")"<<std::endl;
             // TODO: interpret it deeper?
             return Value(context);
         }
