@@ -2,33 +2,10 @@
 
 #include "atom.h"
 #include "tree.h"
+#include "value.h"
 
 #include <map>
 #include <iostream> // TODO: remove
-
-class Context;
-
-class Value {
-    public: // TODO: remove
-    string type;
-    float floatData;
-    int intData;
-    string stringData;
-    std::vector<Value> arrayData;
-    Context* context;
-public:
-    Value():type("undefined"){};
-    Value(Context*, Atom*);
-    Value(Context* c):type("undefined"),context(c){};
-
-    Value op(string op, Value);
-    Value member(Value); // operator "."
-    Value call(std::vector<Value>&);
-
-    Value operator[](const Value&);
-
-    string getRepr();
-};
 
 class Context {
     std::map<string, Value> variables;
