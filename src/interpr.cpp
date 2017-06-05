@@ -1,4 +1,5 @@
 #include "interpr.h"
+#include "builtins.h"
 
 #include <cassert>
 #include <iostream>
@@ -6,6 +7,10 @@
 void Interpreter::run() {
     assert(root->subNodes.size()==1);
     auto program = root->subNodes[0];
+
+    // builtin variables
+    context.addVariable("print", Value(Val(new BuiltInPrint(&context))));
+
     Program(program.get());
     assert(program->name == "Program");
 }
@@ -230,9 +235,9 @@ Value Interpreter::ArrayExpression             (Node* n) {
         }
         ++cur;
     }
-    Value ret(&context);
-    ret.type = "array";
-    ret.arrayData = arrayElems;
+    Value ret(&context, arrayElems);
+    // ret.type = "array";
+    // ret.arrayData = arrayElems;
     return ret;
 }
 // Value Interpreter::AssignmentOperator         (Node* n);

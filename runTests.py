@@ -99,6 +99,40 @@ b=(1,2,3);
 c=6, d=7,8;
 print(a,b,c,d);
 ''', b'1 3 6 7'),
+
+    ('''
+a="asd";
+b=a+"qwe";
+a="xyz";
+c=a+b;
+print(a,b,c);
+''', b'xyz asdqwe xyzasdqwe'),
+
+    ('''
+a="asd";
+a+="qwe";
+a+=" xy";
+print(a);
+''', b'asdqwe xy'),
+
+    ('''
+var a="a";
+b = a + "b";
+b += b;
+c = "x";
+b += c;
+b += c;
+c = a;
+print(b, c);
+''', b'ababxx a'),
+
+    ('''
+a="\x61\x3d\x64";
+b=a;
+print(a, b);
+''', b'a=d a=d'),
+
+
 ]
 
 anyFail = False
