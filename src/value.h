@@ -49,6 +49,8 @@ public:
     Value operator[](const Value&);
     string getRepr();
 
+    bool cond()const;
+
     Val get() { return data; }
 };
 
@@ -63,6 +65,7 @@ public:
     virtual Val call(std::vector<Val>&);
     virtual Val operator[](const Val&);
     virtual string getRepr();
+    virtual bool cond()const { return true; }
 
     Context* getContext() { return context; }
 };
@@ -110,6 +113,7 @@ public:
     // virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
     virtual string getRepr() { return "undefined"; }
+    virtual bool cond()const { return false; }
 };
 
 class ValueArray : public ValueBase {
@@ -138,6 +142,7 @@ public:
     // virtual Val call(std::vector<Val>&);
     virtual Val operator[](const Val&);
     virtual string getRepr();
+    virtual bool cond()const { return data; }
 
     int getData()const {return data;}
 };
@@ -154,6 +159,7 @@ public:
     // virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
     // virtual string getRepr();
+    virtual bool cond()const { return data; }
 
     float getData()const {return data;}
 };
@@ -170,6 +176,24 @@ public:
     // virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
     virtual string getRepr();
+    virtual bool cond()const { return data.size(); }
 
     string getData()const {return data;}
+};
+
+class ValueBoolean : public ValueBase {
+    bool data;
+
+public:
+    ValueBoolean(Context* c, bool v)
+        :ValueBase(c), data(v) {}
+
+    virtual Val op(string op, Val);
+    // virtual Val member(Val);
+    // virtual Val call(std::vector<Val>&);
+    // virtual Val operator[](const Val&);
+    virtual string getRepr();
+    virtual bool cond()const { return data; }
+
+    bool getData()const {return data;}
 };

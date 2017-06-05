@@ -132,6 +132,61 @@ b=a;
 print(a, b);
 ''', b'a=d a=d'),
 
+    ('''
+print(1>2);
+print(100+5>102);
+print(100-60 < 50);
+print(100-49 < 50);
+''', b'false\ntrue\ntrue\nfalse'),
+
+    ('''
+if (1>2)
+    print(1);
+if (1>0)
+    print(2);
+if (1<100)
+    print(3);
+''', b'2\n3'),
+
+    ('''
+if ((1+5) > 10)
+    print(1);
+else
+    if (1>2)
+        print(2);
+    else print(3);
+''', b'3'),
+
+    ('''
+a=1;
+b=5;
+if (a+b >= a+1)
+    print(b);
+if (a+b <= a)
+    print(b);
+else
+    print(a);
+''', b'5\n1'),
+
+    ('''
+if ([]["constructor"])
+    print(1);
+else
+    print(2);
+if ([]["constructo"])
+    print(1);
+else
+    print(2);
+''', b'1\n2'),
+
+#     ('''
+# function foo(a) {
+#     return a+1;
+# }
+# a=1;
+# print(foo(a), foo(10));
+# ''', b'2 11'),
+
 
 ]
 

@@ -59,14 +59,31 @@ void Interpreter::Statement                  (Node* n) {
     } else if (n->subNodes[0]->data != nullptr
             && n->subNodes[0]->data->getRepr() == ";"){
         return;
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "if"){
+        if (n->subNodes.size() == 3) {
+            Value cond = Condition(n->subNodes[1].get());
+            if (cond.cond())
+                Statement(n->subNodes[2].get());
+        } else if (n->subNodes.size() == 5) {
+            Value cond = Condition(n->subNodes[1].get());
+            if (cond.cond())
+                Statement(n->subNodes[2].get());
+            else
+                Statement(n->subNodes[4].get());
+        } else { 
+            std::cout << n->subNodes.size() << std::endl;
+            assert(0);
+        }
     } else {
         // TODO: implement
         assert(0);
     }
 }
-void Interpreter::Condition                  (Node* n) {
-    // TODO: implement
-    assert(0);
+Value Interpreter::Condition                  (Node* n) {
+    assert(n->name == "Condition");
+    assert(n->subNodes.size() == 3);
+    return Expression(n->subNodes[1].get());
 }
 void Interpreter::ForParen                   (Node* n) {
     // TODO: implement
@@ -118,7 +135,7 @@ Value Interpreter::Expression                 (Node* n) {
 Value Interpreter::AssignmentExpression       (Node* n) {
     assert(n->name == "AssignmentExpression");
     // TODO: ConditionalExpression here
-    Value v = AdditiveExpression(n->subNodes[0].get());
+    Value v = EqualityExpression(n->subNodes[0].get());
     if (n->subNodes.size() == 3){
         string op = n->subNodes[1]->subNodes[0]->data->getRepr();
         return v.op(op, AssignmentExpression(n->subNodes[2].get()));
@@ -140,8 +157,25 @@ Value Interpreter::AssignmentExpression       (Node* n) {
 // Value Interpreter::BitwiseOrExpression        (Node* n);
 // Value Interpreter::BitwiseXorExpression       (Node* n);
 // Value Interpreter::BitwiseAndExpression       (Node* n);
-// Value Interpreter::EqualityExpression         (Node* n);
-// Value Interpreter::RelationalExpression       (Node* n);
+Value Interpreter::EqualityExpression         (Node* n) {
+    assert(n->name == "EqualityExpression");
+    Value v = RelationalExpression(n->subNodes[0].get());
+    if (n->subNodes.size() == 3){
+        string op = n->subNodes[1]->subNodes[0]->data->getRepr();
+        return v.op(op, EqualityExpression(n->subNodes[2].get()));
+    }
+    assert(n->subNodes.size() == 1);
+    return v;
+}
+Value Interpreter::RelationalExpression       (Node* n) {
+    assert(n->name == "RelationalExpression");
+    Value v = AdditiveExpression(n->subNodes[0].get());
+    if (n->subNodes.size() == 3){
+        string op = n->subNodes[1]->subNodes[0]->data->getRepr();
+        return v.op(op, RelationalExpression(n->subNodes[2].get()));
+    }
+    return v;
+}
 // Value Interpreter::ShiftExpression            (Node* n);
 Value Interpreter::AdditiveExpression         (Node* n) {
     assert(n->name == "AdditiveExpression");
@@ -216,6 +250,7 @@ Value Interpreter::PrimaryExpression          (Node* n) {
             return ArrayExpression(n->subNodes[1].get());
         }
     }
+    assert(n->subNodes.size() == 1);
     return Value(&context, n->subNodes[0]->data);
 }
 Value Interpreter::ArrayExpression             (Node* n) {

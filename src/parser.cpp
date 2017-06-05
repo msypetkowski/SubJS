@@ -6,17 +6,21 @@
 #define ASSIGNMENT_OPERATORS_STRINGS { \
     "=", "+=", "-=", "*=", "/=", "^=", "&=", "|=", "%=", \
 }
+#define EQUALITY_OPERATORS_STRINGS { "==" , "!=" }
+#define RELATIONAL_OPERATORS_STRINGS { "<", ">", ">=", "<=" }
 #define ADDITIVE_OPERATORS_STRINGS { "+", "-" }
 #define MULTIPLICATIVE_OPERATORS_STRINGS { "*", "/" }
 
 const static SymSet ASSIGNMENT_OPERATORS(ASSIGNMENT_OPERATORS_STRINGS);
+const static SymSet EQUALITY_OPERATORS(EQUALITY_OPERATORS_STRINGS);
+const static SymSet RELATIONAL_OPERATORS(RELATIONAL_OPERATORS_STRINGS);
 const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
 const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
 const static SymSet EXPRESSION_FIRST =
     SymSet({"CONSTANT", "SYMBOL", "(", "["});
 const static SymSet STATEMENT_FIRST =
-    SymSet({";", "var", "const", "let"}) + EXPRESSION_FIRST;
+    SymSet({";", "var", "const", "let", "if"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
     SymSet({"function"}) + STATEMENT_FIRST;
 
@@ -202,6 +206,14 @@ void Parser::Statement                  (const SymSet& follow){
     // TODO: implement rest
     if (isCurAtomKeyword(";")) {
         acceptKeyword(";");
+    } else if (isCurAtomKeyword("if")) {
+        acceptKeyword("if");
+        Condition(first);
+        Statement(follow + SymSet{"else"});
+        if (isCurAtomKeyword("else")) {
+            acceptKeyword("else");
+            Statement(follow);
+        }
     } else {
         VariablesOrExpression(follow + SymSet{";"});
         acceptKeyword(";");
@@ -210,8 +222,11 @@ void Parser::Statement                  (const SymSet& follow){
     tb.treeNodeEnd();
 }
 void Parser::Condition                  (const SymSet& follow){
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("Condition");
+    acceptKeyword("(");
+    Expression(SymSet{")"});
+    acceptKeyword(")");
+    tb.treeNodeEnd();
 }
 void Parser::ForParen                   (const SymSet& follow){
     // TODO: implement
@@ -357,7 +372,7 @@ void Parser::Expression                 (const SymSet& follow) {
 void Parser::AssignmentExpression       (const SymSet& follow) {
     tb.treeNodeStart("AssignmentExpression");
     // TODO: ConditionalExpression here
-    AdditiveExpression(follow + ASSIGNMENT_OPERATORS);
+    EqualityExpression(follow + ASSIGNMENT_OPERATORS);
     if (ASSIGNMENT_OPERATORS.has(curAtom)) {
         AssignmentOperator({});
         AssignmentExpression(follow);
@@ -389,12 +404,23 @@ void Parser::BitwiseAndExpression       (const SymSet& follow) {
     assert(0);
 }
 void Parser::EqualityExpression         (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("EqualityExpression");
+    RelationalExpression(follow + EQUALITY_OPERATORS);
+    if (EQUALITY_OPERATORS.has(curAtom)) {
+        EqualityOperator({});
+        EqualityExpression(follow);
+    }
+    tb.treeNodeEnd();
 }
 void Parser::RelationalExpression       (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("RelationalExpression");
+    // TODO: ShiftExpression here
+    AdditiveExpression(follow + RELATIONAL_OPERATORS);
+    if (RELATIONAL_OPERATORS.has(curAtom)) {
+        RelationalOperator({});
+        RelationalExpression(follow);
+    }
+    tb.treeNodeEnd();
 }
 void Parser::ShiftExpression            (const SymSet& follow) {
     // TODO: implement
@@ -606,12 +632,34 @@ void Parser::AssignmentOperator         (const SymSet& follow) {
     tb.treeNodeEnd();
 }
 void Parser::EqualityOperator           (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("EqualityOperator");
+    vector<string> ops = EQUALITY_OPERATORS_STRINGS;
+    for (string o : ops) {
+        if (isCurAtomKeyword(o)) {
+            acceptKeyword(o);
+            tb.treeNodeEnd();
+            return;
+        }
+    }
+    string msg = "Expected EqualityOperator got: " + curAtom->getStr();
+    errorsPositions.push_back(curAtom->getPos());
+    errorsMessages.push_back(msg);
+    tb.treeNodeEnd();
 }
 void Parser::RelationalOperator         (const SymSet& follow) {
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("RelationalOperator");
+    vector<string> ops = RELATIONAL_OPERATORS_STRINGS;
+    for (string o : ops) {
+        if (isCurAtomKeyword(o)) {
+            acceptKeyword(o);
+            tb.treeNodeEnd();
+            return;
+        }
+    }
+    string msg = "Expected RelationalOperator got: " + curAtom->getStr();
+    errorsPositions.push_back(curAtom->getPos());
+    errorsMessages.push_back(msg);
+    tb.treeNodeEnd();
 }
 void Parser::ShiftOperator              (const SymSet& follow) {
     // TODO: implement

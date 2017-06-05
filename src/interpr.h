@@ -32,7 +32,7 @@ class Interpreter {
     void CompoundStatement          (Node* n);
     void Statements                 (Node* n);
     void Statement                  (Node* n);
-    void Condition                  (Node* n);
+    Value Condition                 (Node* n);
     void ForParen                   (Node* n);
     void ForBegin                   (Node* n);
     void VariableType               (Node* n);
