@@ -174,7 +174,7 @@ public:
     virtual Val op(string op, Val);
     // virtual Val member(Val);
     // virtual Val call(std::vector<Val>&);
-    // virtual Val operator[](const Val&);
+    virtual Val operator[](const Val&);
     virtual string getRepr();
     virtual bool cond()const { return data.size(); }
 

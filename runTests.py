@@ -179,6 +179,24 @@ else
     print(2);
 ''', b'1\n2'),
 
+    ('''
+a="qwe";
+print(a["charAt"](1));
+''', b'w'),
+
+    ('''
+a="qwe";
+b="char" + "At";
+print(a[b](1));
+''', b'w'),
+
+    ('''
+a="qwe";
+b="char" + "At";
+print(a[b](1)[b]);
+print(a[b](1)[b]());
+''', b'function charAt() {\n    [native code]\n}\nw'),
+
 #     ('''
 # function foo(a) {
 #     return a+1;

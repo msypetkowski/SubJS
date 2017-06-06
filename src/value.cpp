@@ -241,6 +241,20 @@ Val ValueString::op(string opr, Val v) {
     }
 }
 
+Val ValueString::operator[](const Val& v) {
+    if (ValueString* va = dynamic_cast<ValueString*>(v.get())) {
+        if (va->data == "charAt") {
+            return Val(new BuiltInCharAt(context, data));
+        } else {
+            return Val(new ValueUndefined(context));
+        }
+    } else if (ValueSymbol* vs = dynamic_cast<ValueSymbol*>(v.get())) {
+        Val val = context->getValue(vs->getData()).get();
+        return (*this)[val];
+    }
+    return Val(new ValueUndefined(context));
+}
+
 string ValueString::getRepr() {
     return data;
 }

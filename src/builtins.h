@@ -35,3 +35,14 @@ public:
     virtual Val operator[](const Val&);
     virtual string getRepr();
 };
+
+class BuiltInCharAt : public ValueBase {
+    string data;
+
+public:
+    BuiltInCharAt(Context* c, string v)
+        :ValueBase(c), data(v) {}
+
+    virtual Val call(std::vector<Val>&);
+    virtual string getRepr();
+};

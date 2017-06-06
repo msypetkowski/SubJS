@@ -38,3 +38,24 @@ string BuiltInArray::getRepr() {
     string name = "Array";
     return  "function " + name + "() {\n    [native code]\n}";
 }
+
+Val BuiltInCharAt::call(std::vector<Val>& v) {
+    if (v.empty()) {
+        string str = "";
+        str += data[0];
+        return Val(new ValueString(context, str));
+    } else if (ValueInteger* vi = dynamic_cast<ValueInteger*>(v[0].get())) {
+        string str = "";
+        str += data[vi->getData()];
+        return Val(new ValueString(context, str));
+    } else {
+        string str = "";
+        str += data[0];
+        return Val(new ValueString(context, str));
+    }
+}
+
+string BuiltInCharAt::getRepr() {
+    string name = "charAt";
+    return  "function " + name + "() {\n    [native code]\n}";
+}
