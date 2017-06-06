@@ -197,13 +197,44 @@ print(a[b](1)[b]);
 print(a[b](1)[b]());
 ''', b'function charAt() {\n    [native code]\n}\nw'),
 
+    ('''
+a=1; var b=2;
+if(a>b) {
+    print(a);
+} else {
+    print(a);
+    print(b);
+}
+''', b'1\n2'),
+
+    ('''
+a=1; var b=2;
+if(a>b - 10) {
+    print(a);
+    if (3>2) {
+        print("abc");
+    }
+} else {
+    print(a);
+    print(b);
+}
+''', b'1\nabc'),
+
+    ('''
+{
+print(1);
+{ print(2); print(3);
+}
+}
+''', b'1\n2\n3'),
+
 #     ('''
 # function foo(a) {
-#     return a+1;
+#     return a;
 # }
 # a=1;
 # print(foo(a), foo(10));
-# ''', b'2 11'),
+# ''', b'1 10'),
 
 
 ]

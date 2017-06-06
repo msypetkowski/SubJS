@@ -45,12 +45,15 @@ void Interpreter::ParameterList              (Node* n) {
     assert(0);
 }
 void Interpreter::CompoundStatement          (Node* n) {
-    // TODO: implement
-    assert(0);
+    assert(n->name == "CompoundStatement");
+    Statements(n->subNodes[1].get());
 }
 void Interpreter::Statements                 (Node* n) {
-    // TODO: implement
-    assert(0);
+    assert(n->name == "Statements");
+    Statement(n->subNodes[0].get());
+    if (n->subNodes.size() == 2) {
+        Statements(n->subNodes[1].get());
+    }
 }
 void Interpreter::Statement                  (Node* n) {
     assert(n->name == "Statement");
@@ -75,6 +78,8 @@ void Interpreter::Statement                  (Node* n) {
             std::cout << n->subNodes.size() << std::endl;
             assert(0);
         }
+    } else  if (n->subNodes[0]->name == "CompoundStatement") {
+        CompoundStatement(n->subNodes[0].get());
     } else {
         // TODO: implement
         assert(0);

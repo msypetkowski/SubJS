@@ -20,7 +20,7 @@ const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 const static SymSet EXPRESSION_FIRST =
     SymSet({"CONSTANT", "SYMBOL", "(", "["});
 const static SymSet STATEMENT_FIRST =
-    SymSet({";", "var", "const", "let", "if"}) + EXPRESSION_FIRST;
+    SymSet({";", "var", "const", "let", "if", "{"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
     SymSet({"function"}) + STATEMENT_FIRST;
 
@@ -101,7 +101,7 @@ void Parser::Program() {
 
 /*
 Element
-    = function Identifier '(' ParameterListOpt ')' CompoundStatement
+    = function ident '(' ParameterListOpt ')' CompoundStatement
     | Statement
 
 ParameterListOpt
@@ -190,12 +190,19 @@ void Parser::ParameterList              (const SymSet& follow){
     assert(0);
 }
 void Parser::CompoundStatement          (const SymSet& follow){
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("CompoundStatement");
+    acceptKeyword("{");
+    Statements(SymSet{"}"});
+    acceptKeyword("}");
+    tb.treeNodeEnd();
 }
 void Parser::Statements                 (const SymSet& follow){
-    // TODO: implement
-    assert(0);
+    tb.treeNodeStart("Statements");
+    Statement(follow + STATEMENT_FIRST);
+    if (STATEMENT_FIRST.has(curAtom)) {
+        Statements(follow);
+    }
+    tb.treeNodeEnd();
 }
 void Parser::Statement                  (const SymSet& follow){
     SymSet first = STATEMENT_FIRST;
@@ -214,6 +221,8 @@ void Parser::Statement                  (const SymSet& follow){
             acceptKeyword("else");
             Statement(follow);
         }
+    } else if (isCurAtomKeyword("{")) {
+        CompoundStatement(follow);
     } else {
         VariablesOrExpression(follow + SymSet{";"});
         acceptKeyword(";");
