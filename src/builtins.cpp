@@ -1,6 +1,8 @@
 #include "builtins.h"
 #include "interpr.h"
 
+#include <cassert>
+
 Val BuiltInFunction::operator[](const Val& v) {
     if (ValueString* vs = dynamic_cast<ValueString*>(v.get())) {
         if (vs->getData() == "constructor") {
@@ -12,6 +14,18 @@ Val BuiltInFunction::operator[](const Val& v) {
         Val val = context->getValue(vsym->getData()).get();
         return (*this)[val];
     }
+    return Val(new ValueUndefined(context));
+}
+
+Val BuiltInFunction::call(std::vector<Val>& args) {
+    std::cout<<"Function object constructor call detected.\n";
+    std::cout<<"Arguments are: ( \n";
+    for (auto a : args) {
+        std::cout<<""<<a->getRepr()<<std::endl;
+    }
+    std::cout<<")"<<std::endl;
+    // TODO: interpret it deeper?
+    exit(0);
     return Val(new ValueUndefined(context));
 }
 
