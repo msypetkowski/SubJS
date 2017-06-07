@@ -19,6 +19,9 @@ static string parseStringLiteral(string lit) {
             } else if (lit[cur+1] == 'n'){
                 ret+='\n';
                 cur+=2;
+            } else if (lit[cur+1] == 'r'){
+                ret+='\r';
+                cur+=2;
             } else if (lit[cur+1] == '\\'){
                 ret+='\\';
                 cur+=2;
@@ -77,6 +80,15 @@ Value::Value(Context* c, vector<Value> v)
     for (auto a : v)
         param.push_back(a.data);
     data = Val(new ValueArray(c, param));
+}
+Value::Value(Context* c, AtomSymbol* s, vector<AtomSymbol*> params, Node* node)
+    :context(c) {
+    vector<string> paramsNames;
+    for(auto sym : params) {
+        paramsNames.push_back(sym->getRepr());
+    }
+    data = Val(new ValueFunction(context, s->getRepr(), paramsNames, node));
+    context->addVariable(s->getRepr(), *this);
 }
 
 Value Value::op(string op, Value v) {
@@ -153,6 +165,12 @@ Val ValueSymbol::operator[](const Val& v) {
 string ValueSymbol::getRepr() {
     Value val = context->getValue(data);
     return val.get()->getRepr();
+}
+
+Val ValueFunction::call(std::vector<Val>& args) {
+    assert(args.size() == params.size());
+    // TODO: implement properly
+    return args[0];
 }
 
 Val ValueUndefined::op(string, Val) {

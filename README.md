@@ -121,16 +121,12 @@ Program
     | epsilon
 
 Element
-    = function Identifier '(' ParameterListOpt ')' CompoundStatement
+    = function Identifier '(' ParameterList ')' CompoundStatement
     | Statement
 
-ParameterListOpt
-    = empty
-    | ParameterList
-
 ParameterList
-    = ident
-    | ident , ParameterList
+    = ident {',' ident}
+    | epsilon
 
 CompoundStatement
     = '{' Statements '}'

@@ -283,14 +283,25 @@ print([1,2,3]["reverse"]()[a]("-=-"));
     print(a);
 ''', b'fedcba'),
 
-#     ('''
-# function foo(a) {
-#     return a;
-# }
-# a=1;
-# print(foo(a), foo(10));
-# ''', b'1 10'),
 
+    ('''
+function qwe(x) {
+    return x;
+}
+print(qwe(123));
+''', b'123'),
+
+    ('''
+function foo(a) {
+    return a;
+}
+a=1;
+print(foo(a), foo(10));
+''', b'1 10'),
+
+    (r'''
+print("a\nb\rc", 1);
+''', b'a\nb\rc 1'),
 
 ]
 

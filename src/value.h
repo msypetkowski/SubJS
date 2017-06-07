@@ -9,7 +9,9 @@ using std::vector;
 using std::shared_ptr;
 
 class Atom;
+class AtomSymbol;
 class Context;
+class Node;
 
 // class Value {
 //     public: // TODO: remove
@@ -42,6 +44,7 @@ public:
     Value(Context* c);
     Value(Val);
     Value(Context*, vector<Value>);
+    Value(Context*, AtomSymbol*, vector<AtomSymbol*>, Node*); // function
 
     Value op(string op, Value);
     Value member(Value); // operator "."
@@ -89,15 +92,16 @@ public:
 
 class ValueFunction : public ValueBase {
     string name;
-    //TODO: node data
+    vector<string> params;
+    Node* node;
 
 public:
-    ValueFunction(Context* c, string nam)
-        :ValueBase(c), name(nam) {}
+    ValueFunction(Context* c, string n, vector<string> p, Node* nod)
+        :ValueBase(c), name(n), params(p), node(nod) {}
 
     // virtual Val op(string op, Val);
     // virtual Val member(Val);
-    // virtual Val call(std::vector<Val>&);
+    virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
     // virtual string getRepr();
 };

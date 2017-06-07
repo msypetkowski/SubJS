@@ -27,8 +27,7 @@ class Interpreter {
     void Program                    (Node *n);
 
     void Element                    (Node* n);
-    void ParameterListOpt           (Node* n);
-    void ParameterList              (Node* n);
+    vector<AtomSymbol*> ParameterList              (Node* n);
     void CompoundStatement          (Node* n);
     void Statements                 (Node* n);
     void Statement                  (Node* n);
@@ -39,7 +38,7 @@ class Interpreter {
     void VariablesOrExpression      (Node* n);
     void Variables                  (Node* n);
     void Variable                   (Node* n);
-    void ExpressionOpt              (Node* n);
+    Value ExpressionOpt              (Node* n);
 
     Value Expression                  (Node* n);
     Value AssignmentExpression        (Node* n);

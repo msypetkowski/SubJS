@@ -27,23 +27,31 @@ void Interpreter::Program(Node* program) {
 void Interpreter::Element(Node *n) {
     assert(n->name == "Element");
 
-    assert(n->subNodes.size()==1);
-
     if (n->subNodes[0]->name == "Statement") {
         Statement(n->subNodes[0].get());
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "function"){
+        AtomSymbol* functionSymbol =
+            dynamic_cast<AtomSymbol*>(n->subNodes[1]->data);
+        assert(functionSymbol);
+        auto params = ParameterList(n->subNodes[3].get());
+        Value(&context, functionSymbol, params, n->subNodes[5].get());
     } else {
         //TODO: implement function
         assert(0);
     }
 }
 
-void Interpreter::ParameterListOpt           (Node* n) {
-    // TODO: implement
-    assert(0);
-}
-void Interpreter::ParameterList              (Node* n) {
-    // TODO: implement
-    assert(0);
+vector<AtomSymbol*> Interpreter::ParameterList              (Node* n) {
+    assert(n->name == "ParameterList");
+    vector<AtomSymbol*> ret;
+    for (unsigned i=0; i<n->subNodes.size(); i+=2) {
+        AtomSymbol* s = dynamic_cast<AtomSymbol*>(
+                n->subNodes[i]->data);
+        assert(s);
+        ret.push_back(s);
+    }
+    return ret;
 }
 void Interpreter::CompoundStatement          (Node* n) {
     assert(n->name == "CompoundStatement");
@@ -125,11 +133,16 @@ void Interpreter::Variable                   (Node* n) {
         context.addVariable(varname, v);
     }
 }
-// void Interpreter::ExpressionOpt              (Node* n) {
-//     // TODO: implement
-//     assert(0);
-// }
-//
+Value Interpreter::ExpressionOpt              (Node* n) {
+    assert(n->name == "ExpressionOpt");
+    if (n->subNodes.size() == 1) {
+        return Expression(n->subNodes[0].get());
+    } else {
+        assert(0);
+    }
+    return Value();
+}
+
 Value Interpreter::Expression                 (Node* n) {
     assert(n->name == "Expression");
     Value v = AssignmentExpression(n->subNodes[0].get());

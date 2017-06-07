@@ -22,7 +22,6 @@ class Parser {
 
     // parsing tree node methods
     void Element        (const SymSet& follow);
-    void ParameterListOpt           (const SymSet& follow);
     void ParameterList              (const SymSet& follow);
     void CompoundStatement          (const SymSet& follow);
     void Statements                 (const SymSet& follow);
