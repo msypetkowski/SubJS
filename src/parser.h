@@ -21,7 +21,8 @@ class Parser {
     bool isCurAtomSymbol();
 
     // parsing tree node methods
-    void Element        (const SymSet& follow);
+    void Element                    (const SymSet& follow);
+    void FunctionDef                (const SymSet& follow);
     void ParameterList              (const SymSet& follow);
     void CompoundStatement          (const SymSet& follow);
     void Statements                 (const SymSet& follow);

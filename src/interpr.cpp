@@ -26,21 +26,26 @@ void Interpreter::Program(Node* program) {
 
 void Interpreter::Element(Node *n) {
     assert(n->name == "Element");
-
     if (n->subNodes[0]->name == "Statement") {
         Statement(n->subNodes[0].get());
-    } else if (n->subNodes[0]->data != nullptr
-            && n->subNodes[0]->data->getRepr() == "function"){
-        AtomSymbol* functionSymbol =
-            dynamic_cast<AtomSymbol*>(n->subNodes[1]->data);
-        assert(functionSymbol);
-        auto params = ParameterList(n->subNodes[3].get());
-        Value(&context, functionSymbol, params, n->subNodes[5].get());
+    } else if (n->subNodes[0]->name == "FunctionDef") {
+        FunctionDef(n->subNodes[0].get());
     } else {
         assert(0);
     }
 }
 
+Value Interpreter::FunctionDef(Node *n) {
+    assert(n->name == "FunctionDef");
+    assert(n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "function");
+
+    AtomSymbol* functionSymbol =
+        dynamic_cast<AtomSymbol*>(n->subNodes[1]->data);
+    assert(functionSymbol);
+    auto params = ParameterList(n->subNodes[3].get());
+    return Value(&context, functionSymbol, params, n->subNodes[5].get());
+}
 vector<AtomSymbol*> Interpreter::ParameterList              (Node* n) {
     assert(n->name == "ParameterList");
     vector<AtomSymbol*> ret;

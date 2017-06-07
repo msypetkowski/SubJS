@@ -13,6 +13,7 @@ class Interpreter {
     void Program                    (Node *n);
 
     void Element                    (Node* n);
+    Value FunctionDef               (Node* n);
     vector<AtomSymbol*> ParameterList              (Node* n);
     void CompoundStatement          (Node* n);
     void Statements                 (Node* n);

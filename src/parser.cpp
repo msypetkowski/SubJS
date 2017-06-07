@@ -101,8 +101,11 @@ void Parser::Program() {
 
 /*
 Element
-    = function Identifier '(' ParameterList ')' CompoundStatement
+    = FunctionDef
     | Statement
+
+FunctionDef
+    = function Identifier '(' ParameterList ')' CompoundStatement
 
 ParameterList
     = ident {',' ident}
@@ -168,15 +171,26 @@ void Parser::Element(const SymSet& follow) {
     tb.treeNodeStart("Element");
 
     if (isCurAtomKeyword("function")) {
-        acceptKeyword("function");
-        acceptSymbol();
-        acceptKeyword("(");
-        ParameterList(SymSet{")"});
-        acceptKeyword(")");
-        CompoundStatement(follow);
+        FunctionDef(follow);
     } else {
         Statement(follow);
     }
+
+    tb.treeNodeEnd();
+}
+
+void Parser::FunctionDef(const SymSet& follow) {
+    SymSet first{"function"};
+    Synchronize s(this, first, follow);
+    if (!canParse) return;
+    tb.treeNodeStart("FunctionDef");
+
+    acceptKeyword("function");
+    acceptSymbol();
+    acceptKeyword("(");
+    ParameterList(SymSet{")"});
+    acceptKeyword(")");
+    CompoundStatement(follow);
 
     tb.treeNodeEnd();
 }
@@ -635,7 +649,6 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
 void Parser::ArrayExpression          (const SymSet& follow) {
     tb.treeNodeStart("ArrayExpression");
     while (!isCurAtomKeyword("]")) {
-        std::cout<<"qwe"<<std::endl;
         if (isCurAtomKeyword(",")) {
             acceptKeyword(",");
         } else if (EXPRESSION_FIRST.has(curAtom)) {

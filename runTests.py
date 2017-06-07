@@ -365,22 +365,22 @@ Running big final tests|
 -----------------------/
 ''')
 
-from bigTests import bigTests
-
-anyFail = False
-for code in bigTests:
-    p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout1 = p.communicate()[0].strip()
-
-    p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    stdout2 = p2.communicate(code.encode())[0].strip()
-
-    if (stdout1 != stdout2):
-        anyFail = True
-        print("Wrong answer for code:")
-        print(code)
-        print("\nExpected:",stdout2)
-        print("Got:     ",stdout1)
-        print("-----------------------------")
-if not anyFail:
-    print("All {} big final tests passed.".format(len(bigTests)))
+# from bigTests import bigTests
+# 
+# anyFail = False
+# for code in bigTests:
+#     p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+#     stdout1 = p.communicate()[0].strip()
+# 
+#     p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+#     stdout2 = p2.communicate(code.encode())[0].strip()
+# 
+#     if (stdout1 != stdout2):
+#         anyFail = True
+#         print("Wrong answer for code:")
+#         print(code)
+#         print("\nExpected:",stdout2)
+#         print("Got:     ",stdout1)
+#         print("-----------------------------")
+# if not anyFail:
+#     print("All {} big final tests passed.".format(len(bigTests)))
