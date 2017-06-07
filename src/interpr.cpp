@@ -28,8 +28,6 @@ void Interpreter::Element(Node *n) {
     assert(n->name == "Element");
     if (n->subNodes[0]->name == "Statement") {
         Statement(n->subNodes[0].get());
-    } else if (n->subNodes[0]->name == "FunctionDef") {
-        FunctionDef(n->subNodes[0].get());
     } else {
         assert(0);
     }
@@ -282,6 +280,8 @@ Value Interpreter::PrimaryExpression          (Node* n) {
         } else if (op == "[") {
             return ArrayExpression(n->subNodes[1].get());
         }
+    } else if (n->subNodes[0]->name == "FunctionDef") {
+        return FunctionDef(n->subNodes[0].get());
     }
     assert(n->subNodes.size() == 1);
     return Value(&context, n->subNodes[0]->data);

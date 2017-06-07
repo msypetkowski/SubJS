@@ -18,11 +18,11 @@ const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
 const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
 const static SymSet EXPRESSION_FIRST =
-    SymSet({"CONSTANT", "SYMBOL", "(", "["});
+    SymSet({"CONSTANT", "SYMBOL", "(", "[", "function"});
 const static SymSet STATEMENT_FIRST =
     SymSet({";", "var", "const", "let", "if", "{", "return", "while"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
-    SymSet({"function"}) + STATEMENT_FIRST;
+    SymSet({}) + STATEMENT_FIRST;
 
 Parser::Parser(Lexer& l):lexer(l), canParse(true) {
     nextAtom();
@@ -172,11 +172,11 @@ void Parser::Element(const SymSet& follow) {
     if (!canParse) return;
     tb.treeNodeStart("Element");
 
-    if (isCurAtomKeyword("function")) {
-        FunctionDef(follow);
-    } else {
-        Statement(follow);
-    }
+    // if (isCurAtomKeyword("function")) {
+    //     FunctionDef(follow);
+    // } else {
+    // }
+    Statement(follow);
 
     tb.treeNodeEnd();
 }
@@ -642,8 +642,11 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
         acceptKeyword("[");
         ArrayExpression(SymSet{"]"});
         acceptKeyword("]");
+    } else if (isCurAtomKeyword("function")) {
+         FunctionDef(follow);
     } else {
         // TODO: false true null this
+        assert(0);
     }
 
     tb.treeNodeEnd();

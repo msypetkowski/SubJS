@@ -197,6 +197,10 @@ Val ValueFunction::call(std::vector<Val>& args) {
     return args[0];
 }
 
+string ValueFunction::getRepr() {
+    return  "function " + name + "() {\n    [some code]\n}";
+}
+
 Val ValueUndefined::op(string, Val) {
     return Val(new ValueUndefined(context));
 }

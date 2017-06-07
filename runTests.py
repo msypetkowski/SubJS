@@ -341,9 +341,14 @@ while((i+=1)<10)
 print(j)
 ''', b'1024'),
 
-#     (r'''
-# var ahtc = [function qwe(x){return x;}, print(123)];
-# ''', b'123'),
+    (r'''
+var ahtc = [function qwe(x){return x;}, print(123)];
+''', b'123'),
+
+    (r'''
+var ahtc = function qwe(x){return x;};
+print(ahtc(321))
+''', b'321'),
 
 ]
 

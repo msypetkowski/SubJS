@@ -106,7 +106,7 @@ public:
     // virtual Val member(Val);
     virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
-    // virtual string getRepr();
+    virtual string getRepr();
 };
 
 class ValueUndefined : public ValueBase {
@@ -166,7 +166,7 @@ public:
     // virtual Val member(Val);
     // virtual Val call(std::vector<Val>&);
     // virtual Val operator[](const Val&);
-    // virtual string getRepr();
+    virtual string getRepr() { return std::to_string(data); }
     virtual bool cond()const { return data; }
 
     float getData()const {return data;}
