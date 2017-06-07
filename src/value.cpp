@@ -194,10 +194,12 @@ string ValueSymbol::getRepr() {
 Val ValueFunction::call(std::vector<Val>& args) {
     assert(args.size() == params.size());
     // TODO: implement properly
-    if (args.empty())
-        return Val(new ValueUndefined(context));
-    else
+    if (args.empty()) {
+        return context->callNode(node).get();
+        //return Val(new ValueUndefined(context));
+    } else {
         return args[0];
+    }
 }
 
 string ValueFunction::getRepr() {

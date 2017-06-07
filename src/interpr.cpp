@@ -55,9 +55,11 @@ vector<AtomSymbol*> Interpreter::ParameterList              (Node* n) {
     }
     return ret;
 }
-void Interpreter::CompoundStatement          (Node* n) {
+Value Interpreter::CompoundStatement          (Node* n) {
+    retVal = Value(&context);
     assert(n->name == "CompoundStatement");
     Statements(n->subNodes[1].get());
+    return retVal;
 }
 void Interpreter::Statements                 (Node* n) {
     assert(n->name == "Statements");
@@ -90,6 +92,9 @@ void Interpreter::Statement                  (Node* n) {
         }
     } else  if (n->subNodes[0]->name == "CompoundStatement") {
         CompoundStatement(n->subNodes[0].get());
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "return"){
+        retVal = ExpressionOpt(n->subNodes[1].get());
     } else if (n->subNodes[0]->data != nullptr
             && n->subNodes[0]->data->getRepr() == "while"){
         Value cond = Condition(n->subNodes[1].get());

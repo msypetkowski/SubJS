@@ -6,6 +6,8 @@
 #include "context.h"
 
 class Interpreter {
+    friend Context;
+
     std::shared_ptr<Node> root;
 
     Context context;
@@ -15,7 +17,9 @@ class Interpreter {
     void Element                    (Node* n);
     Value FunctionDef               (Node* n);
     vector<AtomSymbol*> ParameterList              (Node* n);
-    void CompoundStatement          (Node* n);
+
+    Value retVal;
+    Value CompoundStatement          (Node* n); // return can be inside
     void Statements                 (Node* n);
     void Statement                  (Node* n);
     Value Condition                 (Node* n);
@@ -58,7 +62,7 @@ class Interpreter {
 
 
 public:
-    Interpreter(std::shared_ptr<Node> n):root(n) {}
+    Interpreter(std::shared_ptr<Node> n):root(n),context(*this) {}
 
     void run();
 };

@@ -359,9 +359,28 @@ print(1);
 print(print)
 
 ''', b'function print() {\n    [native code]\n}'),
+
     ('''
 print(eval)
 ''', b'function eval() {\n    [native code]\n}'),
+
+    ('''
+a=1;
+function fun() {
+    return a+1;
+}
+print(fun());
+''', b'2'),
+
+    ('''
+a=1;
+function fun() {
+    b=100;
+    return a+b
+}
+a=2;
+print(fun());
+''', b'102'),
 
 ]
 
