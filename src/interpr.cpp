@@ -89,6 +89,13 @@ void Interpreter::Statement                  (Node* n) {
         }
     } else  if (n->subNodes[0]->name == "CompoundStatement") {
         CompoundStatement(n->subNodes[0].get());
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "while"){
+        Value cond = Condition(n->subNodes[1].get());
+        while(cond.cond()) {
+                Statement(n->subNodes[2].get());
+                cond = Condition(n->subNodes[1].get());
+        }
     } else {
         // TODO: implement
         assert(0);

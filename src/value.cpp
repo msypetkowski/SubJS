@@ -154,6 +154,12 @@ Val ValueSymbol::op(string opr,Val v) {
         }
     } else if (opr == "+=") {
         return op("=", op("+", v));
+    } else if (opr == "-=") {
+        return op("=", op("-", v));
+    } else if (opr == "*=") {
+        return op("=", op("*", v));
+    } else if (opr == "/=") {
+        return op("=", op("/", v));
     } else {
         Value val = context->getValue(data);
         return val.get()->op(opr, v);
