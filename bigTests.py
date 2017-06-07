@@ -11,6 +11,7 @@ print(a);
 
 open("./tests/mal.txt").read(),
 open("./tests/mal2.txt").read(),
+open("./tests/mal3.txt").read(),
 
 r'''
 qgxb="\x74";
