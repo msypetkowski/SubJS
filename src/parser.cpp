@@ -42,6 +42,8 @@ void Parser::acceptKeyword(const string& repr) {
         tb.treeNodeAtom(curAtom);
         nextAtom();
     } else {
+        if (repr == ";") // semicolons are not important
+            return;
         string msg = "Expected keyword: " + repr + " got: " + curAtom->getStr();
         errorsPositions.push_back(curAtom->getPos());
         errorsMessages.push_back(msg);

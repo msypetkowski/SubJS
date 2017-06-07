@@ -215,7 +215,7 @@ if(a>b - 10) {
         print("abc");
     }
 } else {
-    print(a);
+    print(a)
     print(b);
 }
 ''', b'1\nabc'),
@@ -286,7 +286,7 @@ print([1,2,3]["reverse"]()[a]("-=-"));
 
     ('''
 function qwe(x) {
-    return x;
+    return x
 }
 print(qwe(123));
 ''', b'123'),
@@ -320,7 +320,7 @@ while(i<10) {
     (r'''
 i=1;
 i+=5;
-j=2;
+j=2
 i*=j;
 print(i,j);
 ''', b'12 2'),
@@ -332,6 +332,18 @@ while((i+=1)<10)
     j*=2;
 print(j);
 ''', b'1024'),
+
+    (r'''
+i=0
+j=2
+while((i+=1)<10)
+    j*=2
+print(j)
+''', b'1024'),
+
+#     (r'''
+# var ahtc = [function qwe(x){return x;}, print(123)];
+# ''', b'123'),
 
 ]
 
@@ -365,22 +377,22 @@ Running big final tests|
 -----------------------/
 ''')
 
-# from bigTests import bigTests
-# 
-# anyFail = False
-# for code in bigTests:
-#     p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-#     stdout1 = p.communicate()[0].strip()
-# 
-#     p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-#     stdout2 = p2.communicate(code.encode())[0].strip()
-# 
-#     if (stdout1 != stdout2):
-#         anyFail = True
-#         print("Wrong answer for code:")
-#         print(code)
-#         print("\nExpected:",stdout2)
-#         print("Got:     ",stdout1)
-#         print("-----------------------------")
-# if not anyFail:
-#     print("All {} big final tests passed.".format(len(bigTests)))
+from bigTests import bigTests
+
+anyFail = False
+for code in bigTests:
+    p = Popen([executable,'-c',code], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout1 = p.communicate()[0].strip()
+
+    p2 = Popen([jsExecutable], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    stdout2 = p2.communicate(code.encode())[0].strip()
+
+    if (stdout1 != stdout2):
+        anyFail = True
+        print("Wrong answer for code:")
+        print(code)
+        print("\nExpected:",stdout2)
+        print("Got:     ",stdout1)
+        print("-----------------------------")
+if not anyFail:
+    print("All {} big final tests passed.".format(len(bigTests)))
