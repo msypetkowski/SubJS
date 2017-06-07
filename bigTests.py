@@ -9,6 +9,9 @@ var a = ';}\n;keppel nruter	\n	\n;)""(nioj.ecapsetihwxelfa = keppel	\n	\n}	\n;))
 print(a);
 ''',
 
+open("./tests/mal.txt").read(),
+open("./tests/mal2.txt").read(),
+
 r'''
 qgxb="\x74";
 mnzh="\x6f";
@@ -361,6 +364,4 @@ var rtends = "wbeH7";var rothumbnailslist = rtends[""+"\x63"+"harAt"](2);
 print(rtends);
 ''',
 
-
-open("./tests/mal.txt").read(),
 ]
