@@ -283,8 +283,6 @@ print([1,2,3]["reverse"]()[a]("-=-"));
     print(a);
 ''', b'fedcba'),
 
-
-
 #     ('''
 # function foo(a) {
 #     return a;
@@ -341,7 +339,7 @@ for code in bigTests:
         print("Wrong answer for code:")
         print(code)
         print("\nExpected:",stdout2)
-        print("Got:",stdout1)
+        print("Got:     ",stdout1)
         print("-----------------------------")
 if not anyFail:
     print("All {} big final tests passed.".format(len(bigTests)))

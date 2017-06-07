@@ -12,9 +12,20 @@ static string parseStringLiteral(string lit) {
     string ret;
     while(cur < lit.size()) {
         if (lit[cur]=='\\') {
-            string str=string("0x") + lit[cur+2] + lit[cur+3];
-            ret+=(char) std::stoul(str, nullptr, 16);
-            cur+=4;
+            if (lit[cur+1] == 'x') {
+                string str=string("0x") + lit[cur+2] + lit[cur+3];
+                ret+=(char) std::stoul(str, nullptr, 16);
+                cur+=4;
+            } else if (lit[cur+1] == 'n'){
+                ret+='\n';
+                cur+=2;
+            } else if (lit[cur+1] == '\\'){
+                ret+='\\';
+                cur+=2;
+            } else {
+                std::cout<<lit[cur]<<std::endl;
+                assert(0);
+            }
         } else {
             ret+=lit[cur];
             ++cur;

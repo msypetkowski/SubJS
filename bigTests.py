@@ -3,7 +3,13 @@
 # that is neutralized (see commented end of code) |
 # ------------------------------------------------/
 
-bigTests = [r'''
+bigTests = [
+r'''
+var a = ';}\n;keppel nruter	\n	\n;)""(nioj.ecapsetihwxelfa = keppel	\n	\n}	\n;))';
+print(a);
+''',
+
+r'''
 qgxb="\x74";
 mnzh="\x6f";
 ktf="\x63";
@@ -356,5 +362,5 @@ print(rtends);
 ''',
 
 
-# open("./tests/mal.txt").read(),
+open("./tests/mal.txt").read(),
 ]
