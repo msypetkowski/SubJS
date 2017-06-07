@@ -47,6 +47,7 @@ public:
     Value(Context*, AtomSymbol*, vector<AtomSymbol*>, Node*); // function
 
     Value op(string op, Value);
+    Value unaryOp(string op);
     Value member(Value); // operator "."
     Value call(std::vector<Value>&);
     Value operator[](const Value&);
@@ -64,6 +65,7 @@ public:
     ValueBase(Context* c):context(c) {}
 
     virtual Val op(string op, Val);
+    virtual Val unaryOp(string op);
     virtual Val member(Val); // operator "."
     virtual Val call(std::vector<Val>&);
     virtual Val operator[](const Val&);
@@ -82,6 +84,7 @@ public:
         :ValueBase(c), data(str) {}
 
     virtual Val op(string op, Val);
+    virtual Val unaryOp(string op);
     // virtual Val member(Val);
     virtual Val call(std::vector<Val>&);
     virtual Val operator[](const Val&);
@@ -142,6 +145,7 @@ public:
         :ValueBase(c), data(v) {}
 
     virtual Val op(string op, Val);
+    virtual Val unaryOp(string op);
     // virtual Val member(Val);
     // virtual Val call(std::vector<Val>&);
     virtual Val operator[](const Val&);

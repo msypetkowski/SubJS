@@ -91,8 +91,12 @@ Value::Value(Context* c, AtomSymbol* s, vector<AtomSymbol*> params, Node* node)
     context->addVariable(s->getRepr(), *this);
 }
 
-Value Value::op(string op, Value v) {
-    return Value(data->op(op, v.data));
+Value Value::op(string opr, Value v) {
+    return Value(data->op(opr, v.data));
+}
+
+Value Value::unaryOp(string opr){
+    return Value(data->unaryOp(opr));
 }
 Value Value::member(Value v) {
     return Value(data->member(v.data));
@@ -115,6 +119,10 @@ bool Value::cond()const {
 
 
 Val ValueBase::op(string, Val) {
+    assert(0);
+    return Val(new ValueUndefined(context));
+}
+Val ValueBase::unaryOp(string) {
     assert(0);
     return Val(new ValueUndefined(context));
 }
@@ -149,6 +157,16 @@ Val ValueSymbol::op(string opr,Val v) {
     } else {
         Value val = context->getValue(data);
         return val.get()->op(opr, v);
+    }
+}
+
+Val ValueSymbol::unaryOp(string opr) {
+    if(opr == "-") {
+        Value val = context->getValue(data);
+        return val.get()->unaryOp(opr);
+    } else {
+        assert(0);
+        return Val(new ValueUndefined(context));
     }
 }
 
@@ -242,6 +260,14 @@ Val ValueInteger::op(string opr, Val v) {
     } else if (ValueSymbol* vs = dynamic_cast<ValueSymbol*>(v.get())) {
         Val val = context->getValue(vs->getData()).get();
         return op(opr, val);
+    } else {
+        assert(0);
+        return Val(new ValueUndefined(context));
+    }
+}
+Val ValueInteger::unaryOp(string opr) {
+    if (opr == "-") {
+        return Val(new ValueInteger(context, -data));
     } else {
         assert(0);
         return Val(new ValueUndefined(context));

@@ -303,6 +303,11 @@ print(foo(a), foo(10));
 print("a\nb\rc", 1);
 ''', b'a\nb\rc 1'),
 
+    (r'''
+a=-10;
+print(-1, -1+2, -1*2, a);
+''', b'-1 1 -2 -10'),
+
 ]
 
 anyFail = False

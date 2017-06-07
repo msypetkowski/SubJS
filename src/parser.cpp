@@ -553,7 +553,12 @@ UnaryOperator
 void Parser::UnaryExpression            (const SymSet& follow) {
     // TODO: implement properly
     tb.treeNodeStart("UnaryExpression");
-    MemberExpression(follow);
+    if  (isCurAtomKeyword("-")) {
+        acceptKeyword("-");
+        UnaryExpression(follow);
+    } else {
+        MemberExpression(follow);
+    }
     tb.treeNodeEnd();
 }
 void Parser::Constructor                (const SymSet& follow) {

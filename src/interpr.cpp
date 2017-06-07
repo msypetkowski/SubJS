@@ -216,8 +216,12 @@ Value Interpreter::MultiplicativeExpression   (Node* n) {
 }
 Value Interpreter::UnaryExpression            (Node* n) {
     assert(n->name == "UnaryExpression");
-    // TODO: implement rest
-    return MemberExpression(n->subNodes[0].get());
+    if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "-"){
+        return UnaryExpression(n->subNodes[1].get()).unaryOp("-");
+    } else {
+        return MemberExpression(n->subNodes[0].get());
+    }
 }
 // Value Interpreter::Constructor                (Node* n);
 // Value Interpreter::ConstructorCall            (Node* n);
