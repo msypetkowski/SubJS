@@ -10,6 +10,7 @@ void Interpreter::run() {
 
     // builtin variables
     context.addVariable("print", Value(Val(new BuiltInPrint(&context))));
+    context.addVariable("eval", Value(Val(new BuiltInEval(&context))));
 
     Program(program.get());
     assert(program->name == "Program");
