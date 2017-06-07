@@ -350,6 +350,19 @@ var ahtc = function qwe(x){return x;};
 print(ahtc(321))
 ''', b'321'),
 
+    (r'''
+var ahtc = [function cmsg(){return 100;}()];
+print(1);
+''', b'1'),
+
+    ('''
+print(print)
+
+''', b'function print() {\n    [native code]\n}'),
+    ('''
+print(eval)
+''', b'function eval() {\n    [native code]\n}'),
+
 ]
 
 anyFail = False

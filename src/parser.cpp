@@ -199,7 +199,7 @@ void Parser::FunctionDef(const SymSet& follow) {
 
 void Parser::ParameterList              (const SymSet& follow){
     tb.treeNodeStart("ParameterList");
-    Synchronize s(this, SymSet{"SYMBOL"}, follow);
+    Synchronize s(this, SymSet{"SYMBOL",")"}, follow);
     if (!canParse) return;
     while (isCurAtomSymbol()) {
         acceptSymbol();

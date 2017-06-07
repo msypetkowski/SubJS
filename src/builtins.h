@@ -16,6 +16,11 @@ public:
         std::cout<<std::endl;
         return Val(new ValueUndefined(context));
     }
+
+    virtual string getRepr() {
+        string name = "print";
+        return  "function " + name + "() {\n    [native code]\n}";
+    }
 };
 
 class BuiltInFunction : public ValueBase {
@@ -87,5 +92,10 @@ public:
         std::cout<<")"<<std::endl;
         // TODO: interpret it deeper?
         exit(0);
+    }
+
+    virtual string getRepr() {
+        string name = "eval";
+        return  "function " + name + "() {\n    [native code]\n}";
     }
 };
