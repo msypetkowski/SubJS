@@ -157,6 +157,10 @@ Val ValueArray::operator[](const Val& v) {
     } else if (ValueString* vs = dynamic_cast<ValueString*>(v.get())) {
         if (vs->getData() == "constructor") {
             return Val(new BuiltInArray(context));
+        } else if (vs->getData() == "reverse") {
+            return Val(new BuiltInReverse(context, data));
+        } else if (vs->getData() == "join") {
+            return Val(new BuiltInJoin(context, data));
         } else {
             return Val(new ValueUndefined(context));
         }
@@ -245,6 +249,8 @@ Val ValueString::operator[](const Val& v) {
     if (ValueString* va = dynamic_cast<ValueString*>(v.get())) {
         if (va->data == "charAt") {
             return Val(new BuiltInCharAt(context, data));
+        } else if (va->data == "split") {
+            return Val(new BuiltInSplit(context, data));
         } else {
             return Val(new ValueUndefined(context));
         }

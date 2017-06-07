@@ -353,5 +353,8 @@ var rhtc = "Cha\x72";
 print(rhtc);
 var rtends = "wbeH7";var rothumbnailslist = rtends[""+"\x63"+"harAt"](2);
 print(rtends);
-'''
+''',
+
+
+# open("./tests/mal.txt").read(),
 ]

@@ -228,6 +228,63 @@ print(1);
 }
 ''', b'1\n2\n3'),
 
+    ('''
+a="qwe";
+b="split";
+print(a[b]);
+print(a["split"]());
+''', b'function split() {\n    [native code]\n}\nqwe'),
+
+    ('''
+print([1,2,"qwe"]);
+''', b'1,2,qwe'),
+
+    ('''
+print("qwe-asd-zxc"["split"]("-"));
+''', b'qwe,asd,zxc'),
+
+    ('''
+a=[1,2,3];
+print(a["reverse"]);
+''', b'function reverse() {\n    [native code]\n}'),
+
+    ('''
+a=[1,2,3];
+print(a["join"]);
+''', b'function join() {\n    [native code]\n}'),
+
+    ('''
+print([1,2,3]["reverse"]());
+''', b'3,2,1'),
+
+    ('''
+    a="reverse";
+print([1,2,3]["reverse"]()[a]());
+''', b'1,2,3'),
+
+    ('''
+    a="join";
+print([1,2,3]["reverse"]()[a]());
+''', b'3,2,1'),
+
+    ('''
+    a="join";
+print([1,2,3]["reverse"]()[a]("-=-"));
+''', b'3-=-2-=-1'),
+
+    ('''
+    b="abc";
+    print(b["split"](''));
+''', b'a,b,c'),
+
+    ('''
+    b="abcdef";
+    var a=b["split"]('')["reverse"]()["join"]('');
+    print(a);
+''', b'fedcba'),
+
+
+
 #     ('''
 # function foo(a) {
 #     return a;

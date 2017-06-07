@@ -39,11 +39,36 @@ public:
 
 class BuiltInCharAt : public ValueBase {
     string data;
-
 public:
     BuiltInCharAt(Context* c, string v)
         :ValueBase(c), data(v) {}
+    virtual Val call(std::vector<Val>&);
+    virtual string getRepr();
+};
 
+class BuiltInSplit : public ValueBase {
+    string data;
+public:
+    BuiltInSplit(Context* c, string v)
+        :ValueBase(c), data(v) {}
+    virtual Val call(std::vector<Val>&);
+    virtual string getRepr();
+};
+
+class BuiltInReverse : public ValueBase {
+    vector<Val> data;
+public:
+    BuiltInReverse(Context* c, vector<Val> v)
+        :ValueBase(c), data(v) {}
+    virtual Val call(std::vector<Val>&);
+    virtual string getRepr();
+};
+
+class BuiltInJoin : public ValueBase {
+    vector<Val> data;
+public:
+    BuiltInJoin(Context* c, vector<Val> v)
+        :ValueBase(c), data(v) {}
     virtual Val call(std::vector<Val>&);
     virtual string getRepr();
 };

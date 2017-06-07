@@ -2,6 +2,10 @@
 #include "interpr.h"
 
 #include <cassert>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/constants.hpp>
 
 Val BuiltInFunction::operator[](const Val& v) {
     if (ValueString* vs = dynamic_cast<ValueString*>(v.get())) {
@@ -68,8 +72,75 @@ Val BuiltInCharAt::call(std::vector<Val>& v) {
         return Val(new ValueString(context, str));
     }
 }
-
 string BuiltInCharAt::getRepr() {
     string name = "charAt";
+    return  "function " + name + "() {\n    [native code]\n}";
+}
+
+Val BuiltInSplit::call(std::vector<Val>& v) {
+    if (v.empty()) {
+        Val strVal = Val(new ValueString(context, data));
+        return Val(new ValueArray(context, {strVal}));
+    } else if (ValueString* vs = dynamic_cast<ValueString*>(v[0].get())) {
+
+        vector<Val> vec;
+
+        vector<string> splitVec;
+        string d = vs->getData();
+        if (d != "") {
+            boost::split( splitVec, data, boost::is_any_of(d), boost::token_compress_on );
+            for(string s : splitVec) {
+                vec.push_back(Val(new ValueString(context, s)));
+            }
+            return Val(new ValueArray(context, vec));
+        } else {
+            for(char c : data) {
+                string str;
+                str+=c;
+                vec.push_back(Val(new ValueString(context, str)));
+            }
+            return Val(new ValueArray(context, vec));
+        }
+    } else {
+        assert(0);
+        return Val(new ValueUndefined(context));
+    }
+}
+string BuiltInSplit::getRepr() {
+    string name = "split";
+    return  "function " + name + "() {\n    [native code]\n}";
+}
+
+Val BuiltInReverse::call(std::vector<Val>&) {
+    std::vector<Val> vec=data;
+    std::reverse(vec.begin(), vec.end());
+    return Val(new ValueArray(context, vec));
+}
+string BuiltInReverse::getRepr() {
+    string name = "reverse";
+    return  "function " + name + "() {\n    [native code]\n}";
+}
+
+
+Val BuiltInJoin::call(std::vector<Val>& v) {
+    if (v.empty()) {
+        vector<string> strings;
+        for (auto e : data)
+            strings.push_back(e->getRepr());
+        string ret = boost::algorithm::join(strings, ",");
+        return Val(new ValueString(context, ret));
+    } else if (ValueString* vs = dynamic_cast<ValueString*>(v[0].get())) {
+        vector<string> strings;
+        for (auto e : data)
+            strings.push_back(e->getRepr());
+        string ret = boost::algorithm::join(strings, vs->getData());
+        return Val(new ValueString(context, ret));
+    } else {
+        assert(0);
+        return Val(new ValueUndefined(context));
+    }
+}
+string BuiltInJoin::getRepr() {
+    string name = "join";
     return  "function " + name + "() {\n    [native code]\n}";
 }
