@@ -635,12 +635,18 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
 void Parser::ArrayExpression          (const SymSet& follow) {
     tb.treeNodeStart("ArrayExpression");
     while (!isCurAtomKeyword("]")) {
+        std::cout<<"qwe"<<std::endl;
         if (isCurAtomKeyword(",")) {
             acceptKeyword(",");
         } else if (EXPRESSION_FIRST.has(curAtom)) {
             AssignmentExpression(follow + SymSet{","});
             if (!isCurAtomKeyword("]"))
                 acceptKeyword(",");
+        } else {
+            string msg = "Expected ',' ']' or EXPRESSION_FIRST got: " + curAtom->getStr();
+            errorsPositions.push_back(curAtom->getPos());
+            errorsMessages.push_back(msg);
+            break;
         }
     }
     tb.treeNodeEnd();

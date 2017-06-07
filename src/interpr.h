@@ -3,21 +3,7 @@
 #include "atom.h"
 #include "tree.h"
 #include "value.h"
-
-#include <map>
-#include <iostream> // TODO: remove
-
-class Context {
-    std::map<string, Value> variables;
-public:
-    void addVariable(string varName, Value value) {
-        variables[varName] = value;
-    }
-    Value getValue(string name) {
-        return variables[name];
-    };
-    //Value getValue(string name) { return Value(this); };
-};
+#include "context.h"
 
 class Interpreter {
     std::shared_ptr<Node> root;

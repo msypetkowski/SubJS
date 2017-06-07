@@ -55,14 +55,14 @@ Value::Value(Context* c, Atom* atom):context(c) {
             float floatData = boost::lexical_cast<float>((ac->getRepr()));
             data = Val(new ValueFloat(context, floatData));
         } else {
-            assert(0);
+            context->dump();
         }
     } else if ((as=dynamic_cast<AtomSymbol*>(atom))) {
         string str = as->getRepr();
         data = Val(new ValueSymbol(context, str));
     } else {
         // TODO: implement
-        assert(0);
+        context->dump();
     }
 }
 
@@ -119,27 +119,27 @@ bool Value::cond()const {
 
 
 Val ValueBase::op(string, Val) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 Val ValueBase::unaryOp(string) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 Val ValueBase::member(Val) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 Val ValueBase::call(std::vector<Val>&) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 Val ValueBase::operator[](const Val&) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 string ValueBase::getRepr() {
-    assert(0);
+    context->dump();
     return "";
 }
 
@@ -171,7 +171,7 @@ Val ValueSymbol::unaryOp(string opr) {
         Value val = context->getValue(data);
         return val.get()->unaryOp(opr);
     } else {
-        assert(0);
+        context->dump();
         return Val(new ValueUndefined(context));
     }
 }
@@ -259,7 +259,7 @@ Val ValueInteger::op(string opr, Val v) {
         } else if (opr == "<=") {
             return Val(new ValueBoolean(context, data <= vi->data));
         } else {
-            assert(0);
+            context->dump();
             return Val(new ValueUndefined(context));
         }
         
@@ -267,7 +267,7 @@ Val ValueInteger::op(string opr, Val v) {
         Val val = context->getValue(vs->getData()).get();
         return op(opr, val);
     } else {
-        assert(0);
+        context->dump();
         return Val(new ValueUndefined(context));
     }
 }
@@ -275,7 +275,7 @@ Val ValueInteger::unaryOp(string opr) {
     if (opr == "-") {
         return Val(new ValueInteger(context, -data));
     } else {
-        assert(0);
+        context->dump();
         return Val(new ValueUndefined(context));
     }
 }
@@ -294,14 +294,14 @@ Val ValueString::op(string opr, Val v) {
         if (opr == "+") {
             return Val(new ValueString(context, data + va->data));
         } else {
-            assert(0);
+            context->dump();
             return Val(new ValueUndefined(context));
         }
     } else if (ValueSymbol* vs = dynamic_cast<ValueSymbol*>(v.get())) {
         Val val = context->getValue(vs->getData()).get();
         return op(opr, val);
     } else {
-        assert(0);
+        context->dump();
         return Val(new ValueUndefined(context));
     }
 }
@@ -328,7 +328,7 @@ string ValueString::getRepr() {
 
 
 Val ValueBoolean::op(string, Val) {
-    assert(0);
+    context->dump();
     return Val(new ValueUndefined(context));
 }
 

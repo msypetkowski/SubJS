@@ -37,7 +37,6 @@ void Interpreter::Element(Node *n) {
         auto params = ParameterList(n->subNodes[3].get());
         Value(&context, functionSymbol, params, n->subNodes[5].get());
     } else {
-        //TODO: implement function
         assert(0);
     }
 }
@@ -84,7 +83,6 @@ void Interpreter::Statement                  (Node* n) {
             else
                 Statement(n->subNodes[4].get());
         } else { 
-            std::cout << n->subNodes.size() << std::endl;
             assert(0);
         }
     } else  if (n->subNodes[0]->name == "CompoundStatement") {
@@ -98,7 +96,7 @@ void Interpreter::Statement                  (Node* n) {
         }
     } else {
         // TODO: implement
-        assert(0);
+        context.dump();
     }
 }
 Value Interpreter::Condition                  (Node* n) {
@@ -108,15 +106,15 @@ Value Interpreter::Condition                  (Node* n) {
 }
 void Interpreter::ForParen                   (Node* n) {
     // TODO: implement
-    assert(0);
+    context.dump();
 }
 void Interpreter::ForBegin                   (Node* n) {
     // TODO: implement
-    assert(0);
+    context.dump();
 }
 void Interpreter::VariableType               (Node* n) {
     // TODO: implement
-    assert(0);
+    context.dump();
 }
 void Interpreter::VariablesOrExpression      (Node* n) {
     assert(n->name == "VariablesOrExpression");
