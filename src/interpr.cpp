@@ -11,6 +11,7 @@ void Interpreter::run() {
     // builtin variables
     context.addVariable("print", Value(Val(new BuiltInPrint(&context))));
     context.addVariable("eval", Value(Val(new BuiltInEval(&context))));
+    context.addVariable("Array", Value(Val(new BuiltInArray(&context))));
 
     Program(program.get());
     assert(program->name == "Program");
@@ -310,6 +311,9 @@ Value Interpreter::PrimaryExpression          (Node* n) {
         } else if (op == "[") {
             return ArrayExpression(n->subNodes[1].get());
         }
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "new") {
+        return Expression(n->subNodes[1].get());
     } else if (n->subNodes[0]->name == "FunctionDef") {
         return FunctionDef(n->subNodes[0].get());
     }

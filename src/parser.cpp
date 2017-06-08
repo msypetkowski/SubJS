@@ -668,9 +668,13 @@ void Parser::PrimaryExpression          (const SymSet& follow) {
         ArrayExpression(SymSet{"]"});
         acceptKeyword("]");
     } else if (isCurAtomKeyword("function")) {
-         FunctionDef(follow);
+        FunctionDef(follow);
+    } else if (isCurAtomKeyword("new")) {
+        acceptKeyword("new");
+        Expression(follow);
     } else {
         // TODO: false true null this
+        std::cout << curAtom->getStr() << std::endl;
         assert(0);
     }
 

@@ -39,6 +39,7 @@ public:
         :ValueBase(c) {}
 
     virtual Val operator[](const Val&);
+    virtual Val call(std::vector<Val>&);
     virtual string getRepr();
 };
 

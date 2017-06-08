@@ -430,7 +430,11 @@ var CAD0 = 1 * ((-5538 + 5540) - 0);
 print(CAD0);
 ''', b'2'),
 
-
+    ('''
+a = new Array(4);
+b = new Array();
+print(a, b, 1);
+''', b',,,  1'),
 
 
 ]

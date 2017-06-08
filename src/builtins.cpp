@@ -52,6 +52,22 @@ Val BuiltInArray::operator[](const Val& v) {
     return Val(new ValueUndefined(context));
 }
 
+Val BuiltInArray::call(std::vector<Val>& args) {
+    if (args.empty()) {
+        return Val(new ValueArray(context, {Val(new ValueUndefined(context))}));
+    } else {
+        if (ValueInteger* vi = dynamic_cast<ValueInteger*>(args[0].get())) {
+            vector<Val> ret;
+            for (int i=0; i<vi->getData(); ++i) {
+                ret.push_back(Val(new ValueUndefined(context)));
+            }
+            return Val(new ValueArray(context, ret));
+        } else {
+            return Val(new ValueArray(context, {Val(new ValueUndefined(context))}));
+        }
+    }
+}
+
 string BuiltInArray::getRepr() {
     string name = "Array";
     return  "function " + name + "() {\n    [native code]\n}";
