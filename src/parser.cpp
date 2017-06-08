@@ -18,9 +18,11 @@ const static SymSet ADDITIVE_OPERATORS(ADDITIVE_OPERATORS_STRINGS);
 const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 
 const static SymSet EXPRESSION_FIRST =
-    SymSet({"CONSTANT", "SYMBOL", "(", "[", "function"});
+    SymSet({"CONSTANT", "SYMBOL", "(", "[", "function", "-"});
 const static SymSet STATEMENT_FIRST =
-    SymSet({";", "var", "const", "let", "if", "{", "return", "while", "for", "try"}) + EXPRESSION_FIRST;
+    SymSet({";", "var", "const", "let", "if", "{",
+            "return", "while", "for", "try",
+            "break", "continue"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
     SymSet({}) + STATEMENT_FIRST;
 
@@ -273,6 +275,12 @@ void Parser::Statement                  (const SymSet& follow) {
         VariablesOrExpression(SymSet{")"} + follow);
         acceptKeyword(")");
         Statement(follow);
+    } else if (isCurAtomKeyword("break")) {
+        acceptKeyword("break");
+        acceptKeyword(";");
+    } else if (isCurAtomKeyword("continue")) {
+        acceptKeyword("continue");
+        acceptKeyword(";");
     } else {
         VariablesOrExpression(follow + SymSet{";"});
         acceptKeyword(";");

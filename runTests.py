@@ -425,6 +425,14 @@ try {
 }
 ''', b'asd'),
 
+    ('''
+var CAD0 = 1 * ((-5538 + 5540) - 0);
+print(CAD0);
+''', b'2'),
+
+
+
+
 ]
 
 anyFail = False
