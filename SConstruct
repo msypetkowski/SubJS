@@ -5,7 +5,7 @@ SetOption('num_jobs', 8)
 
 # build program
 env = Environment();
-env.Append(CCFLAGS = ' -Wshadow -Wall -Werror -O2 -g')
+env.Append(CCFLAGS = ' -Wshadow -Wall -O2 -g')
 env.Append(CCFLAGS = '-Iboost');
 env.Append(LINKFLAGS = '-lboost_program_options');
 env.Append(LINKFLAGS = '-lboost_system');

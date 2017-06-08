@@ -7,7 +7,7 @@
 
 
 static string parseStringLiteral(string lit) {
-    // TODO: do it properly
+    // TODO: test it
     unsigned cur=0;
     string ret;
     while(cur < lit.size()) {
