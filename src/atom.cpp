@@ -1,6 +1,8 @@
 #include "atom.h"
 
 #include <ostream>
+#include <iostream>
+#include <cassert>
 
 static std::map<string, int> createKeywordsMap() {
     std::map<string, int> ret;
@@ -71,7 +73,8 @@ int AtomConstant::getGrammarSymbolID()const {
 
 static int getKeywordId(const string& s) {
     if (!KEYWORDS_MAP.count(s)) {
-        throw std::string("Wrong keyword string");
+        std::cout << "Wrong keyword string: " << s << std::endl;;
+        assert(0);
     }
     return KEYWORDS_MAP[s];
 }

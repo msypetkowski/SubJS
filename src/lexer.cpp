@@ -265,6 +265,7 @@ vector<std::pair<unsigned,unsigned>> Lexer::getErrors() {
 
 Atom* Lexer::getNextAtom() {
     if (!atoms.empty() && (*atoms.rbegin())->getRepr() == "$") {
+        std::cout << ("Trying to get atom after end of file.") << std::endl;
         throw string("Trying to get atom after end of file.");
     }
     if (pos >= code.size()) {

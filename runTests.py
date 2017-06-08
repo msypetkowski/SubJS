@@ -416,6 +416,15 @@ while(a++ < 20);
 print(a++);
 ''', b'21'),
 
+    ('''
+try {
+    a=1;
+    print("asd");
+} catch (e) {
+    print("qwe");
+}
+''', b'asd'),
+
 ]
 
 anyFail = False

@@ -20,7 +20,7 @@ const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 const static SymSet EXPRESSION_FIRST =
     SymSet({"CONSTANT", "SYMBOL", "(", "[", "function"});
 const static SymSet STATEMENT_FIRST =
-    SymSet({";", "var", "const", "let", "if", "{", "return", "while", "for"}) + EXPRESSION_FIRST;
+    SymSet({";", "var", "const", "let", "if", "{", "return", "while", "for", "try"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
     SymSet({}) + STATEMENT_FIRST;
 
@@ -134,6 +134,7 @@ Statement
     return ExpressionOpt ';'
     CompoundStatement
     VariablesOrExpression ';'
+    try Statement catch '(' VariablesOrExpression ')' Statement
 
 Condition
     = '(' Expression ')'
@@ -261,6 +262,15 @@ void Parser::Statement                  (const SymSet& follow) {
         ExpressionOpt(SymSet{";"});
         acceptKeyword(";");
         ExpressionOpt(SymSet{")"});
+        acceptKeyword(")");
+        Statement(follow);
+    } else if (isCurAtomKeyword("try")) {
+        // try Statement catch '(' VariablesOrExpression ')' Statement
+        acceptKeyword("try");
+        Statement(SymSet{"catch"} + follow);
+        acceptKeyword("catch");
+        acceptKeyword("(");
+        VariablesOrExpression(SymSet{")"} + follow);
         acceptKeyword(")");
         Statement(follow);
     } else {

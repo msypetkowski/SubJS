@@ -118,6 +118,10 @@ void Interpreter::Statement                  (Node* n) {
                 Statement(n->subNodes[7].get());
             }
         }
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "try") {
+        // try Statement catch '(' VariablesOrExpression ')' Statement
+        Statement(n->subNodes[1].get());
     } else {
         // TODO: implement
         context.dump();
