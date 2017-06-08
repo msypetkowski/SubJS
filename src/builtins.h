@@ -94,16 +94,7 @@ public:
     BuiltInEval(Context* c)
         :ValueBase(c) {}
 
-    virtual Val call(std::vector<Val>& args) {
-        std::cout<<"Eval function call detected.\n";
-        std::cout<<"Arguments are: ( \n";
-        for (auto a : args) {
-            std::cout<<""<<a->getRepr()<<std::endl;
-        }
-        std::cout<<")"<<std::endl;
-        // TODO: interpret it deeper?
-        exit(0);
-    }
+    virtual Val call(std::vector<Val>& args);
 
     virtual string getRepr() {
         string name = "eval";

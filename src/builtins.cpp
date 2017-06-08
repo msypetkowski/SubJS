@@ -1,5 +1,6 @@
 #include "builtins.h"
 #include "interpr.h"
+#include "config.h"
 
 #include <cassert>
 #include <boost/algorithm/string/split.hpp>
@@ -22,14 +23,22 @@ Val BuiltInFunction::operator[](const Val& v) {
 }
 
 Val BuiltInFunction::call(std::vector<Val>& args) {
-    std::cout<<"Function object constructor call detected.\n";
-    std::cout<<"Arguments are: ( \n";
-    for (auto a : args) {
-        std::cout<<""<<a->getRepr()<<std::endl;
+    if (CONFIG::DETECT) {
+        std::cout<<"Function object constructor call detected.\n";
+        std::cout<<"Arguments are: ( \n";
+        for (auto a : args) {
+            std::cout<<""<<a->getRepr()<<std::endl;
+        }
+        std::cout<<")"<<std::endl;
+        // TODO: interpret it deeper?
+        string in;
+        std::cout<< "Execute further? (y/n)" << std::endl;
+        std::cin >> in;
+        if (in == "y")
+            return Val(new ValueUndefined(context));
+        else
+            exit(0);
     }
-    std::cout<<")"<<std::endl;
-    // TODO: interpret it deeper?
-    exit(0);
     return Val(new ValueUndefined(context));
 }
 
@@ -183,4 +192,25 @@ Val BuiltInJoin::call(std::vector<Val>& v) {
 string BuiltInJoin::getRepr() {
     string name = "join";
     return  "function " + name + "() {\n    [native code]\n}";
+}
+
+Val BuiltInEval::call(std::vector<Val>& args) {
+    if (CONFIG::DETECT) {
+        std::cout<<"Eval function call detected.\n";
+        std::cout<<"Arguments are: ( \n";
+        for (auto a : args) {
+            std::cout<<""<<a->getRepr()<<std::endl;
+        }
+        std::cout<<")"<<std::endl;
+        // TODO: interpret it deeper?
+        exit(0);
+        string in;
+        std::cout<< "Execute further? (y/n)" << std::endl;
+        std::cin >> in;
+        if (in == "y")
+            return Val(new ValueUndefined(context));
+        else
+            exit(0);
+    }
+    return Val(new ValueUndefined(context));
 }

@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
         ("help,h", "print help message")
         ("lexical-only,l", "perform only lexical analysis")
         ("parse-only,p", "perform only parsing (and lexical analysis)")
+        ("detect", "detect eval and function executions")
         ("ignore,i", "Ignore errors during interpretation")
         ("dump,d", "Dump strings from execution that could be useful for analysis.")
         ("command,c", po::value<string>(), "execute command")
@@ -52,6 +53,9 @@ int main(int argc, char **argv) {
     }
     if (vm.count("dump")) {
         CONFIG::DUMP = true;
+    }
+    if (vm.count("detect")) {
+        CONFIG::DETECT = true;
     }
 
     conflicting_options(vm, "lexical-only", "parse-only");
