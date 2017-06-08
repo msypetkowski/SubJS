@@ -436,6 +436,16 @@ b = new Array();
 print(a, b, 1);
 ''', b',,,  1'),
 
+    ('''
+a=new String();
+a+="qwe";
+print(a);
+''', b'qwe'),
+
+    ('''
+print(String);
+''', b'function String() {\n    [native code]\n}'),
+
 
 ]
 

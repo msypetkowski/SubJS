@@ -12,6 +12,8 @@ void Interpreter::run() {
     context.addVariable("print", Value(Val(new BuiltInPrint(&context))));
     context.addVariable("eval", Value(Val(new BuiltInEval(&context))));
     context.addVariable("Array", Value(Val(new BuiltInArray(&context))));
+    context.addVariable("String", Value(Val(new BuiltInString(&context))));
+    context.addVariable("Function", Value(Val(new BuiltInFunction(&context))));
 
     Program(program.get());
     assert(program->name == "Program");

@@ -73,6 +73,30 @@ string BuiltInArray::getRepr() {
     return  "function " + name + "() {\n    [native code]\n}";
 }
 
+
+Val BuiltInString::operator[](const Val& v) {
+    if (ValueString* vs = dynamic_cast<ValueString*>(v.get())) {
+        if (vs->getData() == "constructor") {
+            return Val(new BuiltInFunction(context));
+        } else {
+            return Val(new ValueUndefined(context));
+        }
+    } else if (ValueSymbol* vsym = dynamic_cast<ValueSymbol*>(v.get())) {
+        Val val = context->getValue(vsym->getData()).get();
+        return (*this)[val];
+    }
+    return Val(new ValueUndefined(context));
+}
+
+Val BuiltInString::call(std::vector<Val>&) {
+    return Val(new ValueString(context, ""));
+}
+
+string BuiltInString::getRepr() {
+    string name = "String";
+    return  "function " + name + "() {\n    [native code]\n}";
+}
+
 Val BuiltInCharAt::call(std::vector<Val>& v) {
     if (v.empty()) {
         string str = "";
