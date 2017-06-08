@@ -2,6 +2,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "interpr.h"
+#include "config.h"
 
 #include <iostream>
 #include <boost/program_options.hpp>
@@ -27,6 +28,8 @@ int main(int argc, char **argv) {
         ("help,h", "print help message")
         ("lexical-only,l", "perform only lexical analysis")
         ("parse-only,p", "perform only parsing (and lexical analysis)")
+        ("ignore,i", "Ignore errors during interpretation")
+        ("dump,d", "Dump strings from execution that could be useful for analysis.")
         ("command,c", po::value<string>(), "execute command")
         ("input-file", po::value<string>(), "input file")
     ;
@@ -42,6 +45,13 @@ int main(int argc, char **argv) {
     if (vm.count("help")) {
         cout << desc << endl;
         return 1;
+    }
+
+    if (vm.count("ignore")) {
+        CONFIG::IGNORE = true;
+    }
+    if (vm.count("dump")) {
+        CONFIG::DUMP = true;
     }
 
     conflicting_options(vm, "lexical-only", "parse-only");
@@ -108,6 +118,9 @@ int main(int argc, char **argv) {
         if (p.getErrorsMessages().empty()) {
             Interpreter i(p.getTreeRoot());
             i.run();
+            if (CONFIG::DUMP) {
+                i.getContext()->dump(true);
+            }
         } else {
             cout << "Errors:" << endl;
             assert(p.getErrorsPositions().size() == p.getErrorsMessages().size());

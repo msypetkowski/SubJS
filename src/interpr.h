@@ -65,4 +65,6 @@ public:
     Interpreter(std::shared_ptr<Node> n):root(n),context(*this) {}
 
     void run();
+
+    Context* getContext() { return &context; }
 };

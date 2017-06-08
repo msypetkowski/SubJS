@@ -32,6 +32,7 @@ test_sources.append(Glob('_build/interpr.o'))
 test_sources.append(Glob('_build/value.o'))
 test_sources.append(Glob('_build/builtins.o'))
 test_sources.append(Glob('_build/context.o'))
+test_sources.append(Glob('_build/config.o'))
 build_test = env_test.Program(target = 'test', source = test_sources);
 Depends(build_test, build)
 
