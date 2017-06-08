@@ -28,8 +28,6 @@ class Parser {
     void Statements                 (const SymSet& follow);
     void Statement                  (const SymSet& follow);
     void Condition                  (const SymSet& follow);
-    void ForParen                   (const SymSet& follow);
-    void ForBegin                   (const SymSet& follow);
     void VariableType               (const SymSet& follow);
     void VariablesOrExpression      (const SymSet& follow);
     void Variables                  (const SymSet& follow);

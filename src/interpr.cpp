@@ -102,6 +102,22 @@ void Interpreter::Statement                  (Node* n) {
                 Statement(n->subNodes[2].get());
                 cond = Condition(n->subNodes[1].get());
         }
+    } else if (n->subNodes[0]->data != nullptr
+            && n->subNodes[0]->data->getRepr() == "for"){
+        // for '(' VariablesOrExpression ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+        // for '(' ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+        if (n->subNodes[2]->name == "VariablesOrExpression") {
+            VariablesOrExpression(n->subNodes[2].get());
+            for(;ExpressionOpt(n->subNodes[4].get()).cond();
+                 ExpressionOpt(n->subNodes[6].get())) {
+                Statement(n->subNodes[8].get());
+            }
+        } else {
+            for(;ExpressionOpt(n->subNodes[3].get()).cond();
+                 ExpressionOpt(n->subNodes[5].get())) {
+                Statement(n->subNodes[7].get());
+            }
+        }
     } else {
         // TODO: implement
         context.dump();

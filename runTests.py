@@ -382,6 +382,33 @@ a=2;
 print(fun());
 ''', b'102'),
 
+    ('''
+j=0;
+for(var a=0; a<4; a+=1)
+    j+=a;
+print(a,j)
+''', b'4 6'),
+
+    ('''
+j=0;
+a=j;
+b=0;
+for(; a<4; a+=1) {
+    j+=a;
+    b+=2;
+}
+print(a,b,j)
+''', b'4 8 6'),
+
+    ('''
+j=0;
+q=function a(){return 100;}
+for(var a=0; a<q(); a+=1) {
+    j+=a;
+}
+print(a,j)
+''', b'100 4950'),
+
 ]
 
 anyFail = False

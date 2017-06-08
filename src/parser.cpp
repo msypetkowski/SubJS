@@ -20,7 +20,7 @@ const static SymSet MULTIPLICATIVE_OPERATORS(MULTIPLICATIVE_OPERATORS_STRINGS);
 const static SymSet EXPRESSION_FIRST =
     SymSet({"CONSTANT", "SYMBOL", "(", "[", "function"});
 const static SymSet STATEMENT_FIRST =
-    SymSet({";", "var", "const", "let", "if", "{", "return", "while"}) + EXPRESSION_FIRST;
+    SymSet({";", "var", "const", "let", "if", "{", "return", "while", "for"}) + EXPRESSION_FIRST;
 const static SymSet ELEMENT_FIRST =
     SymSet({}) + STATEMENT_FIRST;
 
@@ -125,9 +125,9 @@ Statement
     if Condition Statement
     if Condition Statement else Statement
     while Condition Statement
-    ForParen ';' ExpressionOpt ';' ExpressionOpt ')' Statement
-    ForBegin ';' ExpressionOpt ';' ExpressionOpt ')' Statement
-    ForBegin in Expression ')' Statement
+    for '(' VariablesOrExpression ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    for '(' ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+    for '(' VariablesOrExpression in Expression ')' Statement
     break ';'
     continue ';'
     with '(' Expression ')' Statement
@@ -137,12 +137,6 @@ Statement
 
 Condition
     = '(' Expression ')'
-
-ForParen
-    = for '('
-
-ForBegin
-    = ForParen VariablesOrExpression
 
 VariableType
     = var
@@ -252,6 +246,23 @@ void Parser::Statement                  (const SymSet& follow) {
         acceptKeyword("while");
         Condition(STATEMENT_FIRST);
         Statement(follow);
+
+    } else if (isCurAtomKeyword("for")) {
+        // for '(' VariablesOrExpression ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+        // for '(' ';' ExpressionOpt ';' ExpressionOpt ')' Statement
+        acceptKeyword("for");
+        acceptKeyword("(");
+        if (isCurAtomKeyword(";")) {
+            acceptKeyword(";");
+        } else {
+            VariablesOrExpression(SymSet{";"});
+            acceptKeyword(";");
+        }
+        ExpressionOpt(SymSet{";"});
+        acceptKeyword(";");
+        ExpressionOpt(SymSet{")"});
+        acceptKeyword(")");
+        Statement(follow);
     } else {
         VariablesOrExpression(follow + SymSet{";"});
         acceptKeyword(";");
@@ -265,14 +276,6 @@ void Parser::Condition                  (const SymSet& follow){
     Expression(SymSet{")"});
     acceptKeyword(")");
     tb.treeNodeEnd();
-}
-void Parser::ForParen                   (const SymSet& follow){
-    // TODO: implement
-    assert(0);
-}
-void Parser::ForBegin                   (const SymSet& follow){
-    // TODO: implement
-    assert(0);
 }
 void Parser::VariableType               (const SymSet& follow){
     SymSet first = {"var", "let", "const"};
