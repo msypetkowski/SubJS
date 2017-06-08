@@ -491,6 +491,7 @@ void Parser::MultiplicativeExpression   (const SymSet& follow) {
 /*
 UnaryExpression
     = MemberExpression
+    | MemberExpression '++'
     | UnaryOperator UnaryExpression
     | '-' UnaryExpression
     | IncrementOperator MemberExpression // TODO
@@ -582,6 +583,9 @@ void Parser::UnaryExpression            (const SymSet& follow) {
         UnaryExpression(follow);
     } else {
         MemberExpression(follow);
+        if (isCurAtomKeyword("++")) {
+            acceptKeyword("++");
+        }
     }
     tb.treeNodeEnd();
 }

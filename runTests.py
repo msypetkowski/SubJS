@@ -403,11 +403,18 @@ print(a,b,j)
     ('''
 j=0;
 q=function a(){return 100;}
-for(var a=0; a<q(); a+=1) {
+for(var a=0; a<q(); a++) {
     j+=a;
 }
 print(a,j)
 ''', b'100 4950'),
+
+    ('''
+a=1;
+j=10;
+while(a++ < 20);
+print(a++);
+''', b'21'),
 
 ]
 

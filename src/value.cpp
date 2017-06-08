@@ -170,6 +170,8 @@ Val ValueSymbol::unaryOp(string opr) {
     if(opr == "-") {
         Value val = context->getValue(data);
         return val.get()->unaryOp(opr);
+    } else if (opr == "++") {
+        return op("=", op("+", Val(new ValueInteger(context, 1))));
     } else {
         context->dump();
         return Val(new ValueUndefined(context));

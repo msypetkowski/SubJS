@@ -249,7 +249,12 @@ Value Interpreter::UnaryExpression            (Node* n) {
             && n->subNodes[0]->data->getRepr() == "-"){
         return UnaryExpression(n->subNodes[1].get()).unaryOp("-");
     } else {
-        return MemberExpression(n->subNodes[0].get());
+        if (n->subNodes.size() == 2) {
+            assert(n->subNodes[1]->data->getRepr() == "++");
+            return MemberExpression(n->subNodes[0].get()).unaryOp("++");
+        } else {
+            return MemberExpression(n->subNodes[0].get());
+        }
     }
 }
 // Value Interpreter::Constructor                (Node* n);
