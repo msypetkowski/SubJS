@@ -157,8 +157,7 @@ class ValueString : public ValueBase {
     string data;
 
 public:
-    ValueString(Context* c, string v)
-        :ValueBase(c), data(v) {}
+    ValueString(Context* c, string v);
 
     virtual Val op(string op, Val);
     // virtual Val member(Val);

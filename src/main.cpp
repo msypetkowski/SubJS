@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
         ("detect", "detect eval and function executions")
         ("ignore,i", "Ignore errors during interpretation")
         ("dump,d", "Dump strings from execution that could be useful for analysis.")
+        ("strings,s", "Dump strings from execution that could be useful for analysis.")
         ("command,c", po::value<string>(), "execute command")
         ("input-file", po::value<string>(), "input file")
     ;
@@ -56,6 +57,9 @@ int main(int argc, char **argv) {
     }
     if (vm.count("detect")) {
         CONFIG::DETECT = true;
+    }
+    if (vm.count("strings")) {
+        CONFIG::STRINGS = true;
     }
 
     conflicting_options(vm, "lexical-only", "parse-only");
@@ -124,6 +128,9 @@ int main(int argc, char **argv) {
             i.run();
             if (CONFIG::DUMP) {
                 i.getContext()->dump(true);
+            }
+            if (CONFIG::STRINGS) {
+                i.getContext()->printStrings();
             }
         } else {
             cout << "Errors:" << endl;

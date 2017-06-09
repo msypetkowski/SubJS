@@ -296,6 +296,11 @@ Val ValueInteger::operator[](const Val&) {
     return Val(new ValueUndefined(context));
 }
 
+ValueString::ValueString(Context* c, string v)
+    :ValueBase(c), data(v) {
+    context->logString(v);
+}
+
 string ValueInteger::getRepr() {
     return std::to_string(data);
 }
